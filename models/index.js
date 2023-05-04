@@ -2,12 +2,9 @@ const dbConfig = require("../config/db.config.js");
 const mongoose = require("mongoose");
 const db = {};
 db.mongoose = mongoose;
-// console.log(db.config.URL);
-// console.log(dbConfig.URL);
+
 (async () => {
   try {
-    // console.log(db.config.URL);
-    console.log("slay");
     await db.mongoose.connect(dbConfig.URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
