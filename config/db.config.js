@@ -5,12 +5,10 @@ const config = {
   PASSWORD: process.env.DB_PASSWORD || 123,
   DB: process.env.DB_NAME || "Evergreen",
   HOST: process.env.DB_HOST || "atlascluster.wdlmhli.mongodb.net",
-  SECRET: process.env.SECRET
+  SECRET: process.env.SECRET,
 };
 // config.URL = `mongodb+srv://${config.USER}:${config.PASSWORD}.@${config.HOST}/${config.DB}?retryWrites=true&w=majority`;
 config.URL = `mongodb+srv://beatriz:123@atlascluster.wdlmhli.mongodb.net/Evergreen?retryWrites=true&w=majority`;
 console.log(config.URL);
 
-module.exports = {
-  config,
-}
+module.exports = config;
