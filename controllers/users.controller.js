@@ -19,9 +19,12 @@ exports.create = async (req, res) => {
       username: req.body.username,
       email: req.body.email,
       // hash its password (8 = #rounds – more rounds, more time)
-      password: req.body.password,
-      // password: bcrypt.hashSync(req.body.password, 10),
+      // password: req.body.password,
+      password: bcrypt.hashSync(req.body.password, 10),
       type: req.body.type,
+      name: req.body.name,
+      school: req.body.school,
+
     });
     return res
       .status(201)
@@ -47,7 +50,7 @@ exports.login = async (req, res) => {
         msg: "Must provide username and password." 
       });
     
-    let user = await User.findOne({ where: { username: req.body.username } }); //get user data from DB
+    let user = await User.findOne({  username: req.body.username  }); //get user data from DB
     if (!user) return res.status(404).json({ 
       success: false, 
       msg: "User not found." 
