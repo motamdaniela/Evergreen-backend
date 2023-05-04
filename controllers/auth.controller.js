@@ -1,13 +1,13 @@
-const encodedHeader = base64urlEncode(header);
+// const encodedHeader = base64urlEncode(header);
 
-const encodedPayload = base64urlEncode(payload);
+// const encodedPayload = base64urlEncode(payload);
 
-const data = encodedHeader + "." + encodedPayload;
-const hashedData = Hash(data, secret);
-const signature = base64urlEncode(hashedData);
+// const data = encodedHeader + "." + encodedPayload;
+// const hashedData = Hash(data, secret);
+// const signature = base64urlEncode(hashedData);
 
 // header.payload.signature
-const JWT = encodedHeader + "." + encodedPayload + "." + signature;
+// const JWT = encodedHeader + "." + encodedPayload + "." + signature;
 
 exports.verifyToken = (req, res, next) => {
     // search token in headers most commonly used for authorization
