@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const usersController = require("../controllers/users.controller");
+const  authController = require("../controllers/auth.controller");
 
 router.use((req, res, next) => {
   const start = Date.now();
@@ -14,8 +15,12 @@ router.use((req, res, next) => {
   });
   next();
 });
-router.route("/").get(usersController.findAll);
-router.route("/:userID").get(usersController.findOne)
+router.route("/")
+  .get(authController.verifyToken, usersController.findAll); // admin access
+
+router.route("/:userID")
+  .get(authController.verifyToken, usersController.findOne) //  admin or logged user only 
+
 router.route("/admins").get(usersController.findAdmins);
 router.route("/allusers").get(usersController.findUsers);
 

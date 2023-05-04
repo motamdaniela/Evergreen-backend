@@ -1,5 +1,12 @@
+const jwt = require("jsonwebtoken"); //JWT tokens creation (sign())
+const bcrypt = require("bcryptjs"); //password encryption
+const config = require("../config/config.js");
+
 const db = require("../models");
 const User = db.users;
+
+// ? idk if this is right but ig
+const { ValidationError } = require('mongoose');
 
 exports.findAll = async (req, res) => {
 

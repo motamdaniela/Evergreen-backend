@@ -9,4 +9,8 @@ const config = {
 // config.URL = `mongodb+srv://${config.USER}:${config.PASSWORD}.@${config.HOST}/${config.DB}?retryWrites=true&w=majority`;
 config.URL = `mongodb+srv://beatriz:123@atlascluster.wdlmhli.mongodb.net/Evergreen?retryWrites=true&w=majority`;
 console.log(config.URL);
-module.exports = config;
+
+module.exports = {
+  config,
+  SECRET: process.env.SECRET
+}
