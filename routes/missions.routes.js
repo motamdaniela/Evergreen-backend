@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const missionsController = require("../controllers/missions.controller");
+const authController = require("../controllers/auth.controller");
 
 router.use((req, res, next) => {
   const start = Date.now();
@@ -14,7 +15,7 @@ router.use((req, res, next) => {
   });
   next();
 });
-router.route("/").get(missionsController.findAll);
+router.route("/").get(authController.verifyToken, missionsController.findAll);
 
 router.route("/:missionID")
   .get(missionsController.findOne)
