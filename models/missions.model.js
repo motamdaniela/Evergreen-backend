@@ -6,12 +6,12 @@ module.exports = (mongoose) => {
       description: String,
       reward: String,
       users: Array,
-      max: Number, 
+      max: Number,
       redirect: String,
-      type: Number
+      type: Number,
     },
     { timestamps: false }
   );
-  const Mission = mongoose.model("mission", schema);
+  const Mission = mongoose.model("missions", schema);
   return Mission;
 };

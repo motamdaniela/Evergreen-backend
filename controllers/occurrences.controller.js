@@ -89,3 +89,25 @@ exports.findOne = async (req, res) => {
     });
   }
 };
+
+exports.validate = async (req, res) => {
+  try {
+    if (req.loggedUserType == "user") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires ADMIN/SECURITY role!",
+      });
+    } else {
+      let occurrence = await Occurrence.findById(req.params.occID);
+      occurrence.state = req.body.state;
+      await occurrence.save();
+      res.status(200).json({ success: true, occurrence: occurrence });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      msg:
+        err.message || "Some error occurred while retrieving this occurrence.",
+    });
+  }
+};
