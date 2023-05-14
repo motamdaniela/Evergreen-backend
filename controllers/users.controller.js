@@ -203,7 +203,7 @@ exports.blockUser = async (req, res) => {
       });
     }
   }
-  catch {
+  catch (err) {
     return res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred",
