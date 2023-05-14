@@ -6,14 +6,11 @@ module.exports = (mongoose) => {
     date: String,
     begin: Number,
     end: Number,
-    desc1: String,
-    desc2: String,
-    desc3: String,
+    description: String,
     title: String,
     coordinator: String,
     place: String,
     users: Array,
-    participated: Array,
   });
   const Activity = mongoose.model("activities", schema);
   return Activity;
