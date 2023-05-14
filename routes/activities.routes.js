@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const activitiesController = require("../controllers/activities.controller");
+const authController = require("../controllers/auth.controller");
 
 // router.route("/").get(activitiesController.findAll);
 // router.route("/:activityID").get(activitiesController.findOne);
@@ -29,6 +30,8 @@ router.use((req, res, next) => {
 });
 router.route("/").get(activitiesController.findAll);
 router.route("/:activityID").get(activitiesController.findOne);
-router.route("/:activityID/users/:userID").put(activitiesController.subscribe);
+router.route("/:activityID/users/:userID")
+  .put(activitiesController.subscribe)
+  .put(authController.verifyToken, activitiesController.verifyParticipation);
 
 module.exports = router;
