@@ -15,18 +15,19 @@ router.use((req, res, next) => {
   });
   next();
 });
-router
-  .route("/")
+
+router.route("/")
   .get(usersController.findAll)
-  .get(authController.verifyToken, usersController.getAllUsers)
-  .post(usersController.create); // admin access only
-router
-  .route("/:userID")
+  .get(authController.verifyToken, usersController.getAllUsers) 
+  .post(usersController.create); 
+
+router.route("/:userID")
   .get(usersController.findOne)
   .get(authController.verifyToken, usersController.getUser); // admin or logged user only
 // router.route("/admins").get(usersController.findAdmins);
 // router.route("/allusers").get(usersController.findUsers);
 
-router.route("/login").post(usersController.login);
+router.route("/login")
+  .post(usersController.login);
 
 module.exports = router;
