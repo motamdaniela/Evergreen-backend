@@ -5,8 +5,6 @@ const db = require("../models");
 const { verifyToken } = require("./auth.controller.js");
 const User = db.users;
 
-exports.getUser = async (req, res) => {};
-
 exports.create = async (req, res) => {
   try {
     if (!req.body && !req.body.username && !req.body.password)
@@ -157,28 +155,53 @@ exports.getAllUsers = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    if (req.loggedUserType !== "admin") 
+    if (req.loggedUserType !== "admin") {
       return res.status(403).json({
         success: false, msg: "This request requires ADMIN role!"
       });
-
-    let users = await User.find({})
-    let index = users.indexOf(users.find((user) => user.id === req.params.id))
-  
-    if (index > -1) {
-      users.splice(index, 1);
-      return res.status(200).json({
-        success: true,
-        users: data,
-      });
     } else {
-      return res.status(404).json({
-        success: false,
-        message: `Cannot find user with id ${req.params.userID}`,
-      });
+      let users = await User.find({})
+      let index = users.indexOf(users.find((user) => user.id === req.params.userID))
+    
+      if (index > -1) {
+        users.splice(index, 1);
+        return res.status(200).json({
+          success: true,
+          users: users,
+        });
+      } else {
+        return res.status(404).json({
+          success: false,
+          message: `Cannot find user with id ${req.params.userID}`,
+        });
+      }
     }
   }
   catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};
+
+exports.blockUser = async (req, res) => {
+  try {
+    if (req.loggedUserType !== "admin") {
+      return res.status(403).json({
+        success: false, msg: "This request requires ADMIN role!"
+      });
+    } else {
+      let user = await User.findById(req.params.userID);
+      user.state = req.body.state;
+      await user.save();
+      return res.status(200).json({ 
+        success: true, 
+        user: user 
+      });
+    }
+  }
+  catch {
     return res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred",
