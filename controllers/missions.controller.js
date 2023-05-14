@@ -5,16 +5,30 @@ const Mission = db.missions;
 // use comment.save() to create a new comment document
 // use Tutorial.findByIdAndUpdate() (with the $push operator) to include the new comment
 // reference in the tutorial document
+
 exports.findAll = async (req, res) => {
   // let title = req.query.title;
 
   try {
-    let data = await Mission.find({})
-
-    return res.status(200).json({
-      success: true,
-      missions: data,
-    });
+    //o utilizador deve ter sessão iniciada
+    if (req.loggedUser){
+      //utilozadores do tipo admin não devem ter acesso às missoes
+      if(req.loggedUser.Role === "admin"){
+        return res.status(403).json({
+          success: false, msg: "You’re not allowed to perform this request"
+        });
+      }
+      let data = await Mission.find({})
+  
+      return res.status(200).json({
+        success: true,
+        missions: data,
+      });
+    } else {
+      return res.status(401).json({
+        success: false, msg: "You must be authenticated to perform this request"
+      });
+    }
   } catch (err) {
     return res.status(500).json({
       success: false,
