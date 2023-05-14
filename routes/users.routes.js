@@ -23,8 +23,10 @@ router.route("/")
 
 router.route("/:userID")
   .get(usersController.findOne)
-  .get(authController.verifyToken, usersController.getUser); // admin or logged user only
-// router.route("/admins").get(usersController.findAdmins);
+  .get(authController.verifyToken, usersController.getUser) // admin or logged user only
+  .delete(authController.verifyToken, usersController.deleteUser)
+
+  // router.route("/admins").get(usersController.findAdmins);
 // router.route("/allusers").get(usersController.findUsers);
 
 router.route("/login")
