@@ -64,8 +64,8 @@ exports.login = async (req, res) => {
       msg:"Invalid credentials!" 
     });
     
-    // sign the given payload (user ID and role) into a JWT payload – builds JWT token, using secret key
-    const token = jwt.sign({ id: user.id, role: user.role },
+    // sign the given payload (user ID and type) into a JWT payload – builds JWT token, using secret key
+    const token = jwt.sign({ id: user.id, type: user.type },
       config.SECRET, { expiresIn: '24h' // 24 hours
     });
     return res.status(200).json({ 
