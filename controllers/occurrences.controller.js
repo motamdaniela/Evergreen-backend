@@ -2,19 +2,19 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const config = require("../config/db.config.js");
 const db = require("../models");
+const { verifyToken } = require("./auth.controller.js");
 const Occurrence = db.occurrences;
 
 exports.findAll = async (req, res) => {
   try {
+    console.log(req.loggedUserType);
     if (req.loggedUserType == "user") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN/SECURITY role!",
       });
     } else {
-      let occurrences = await Occurrence.findAll({
-        attributes: ["id", "type", "description", "photo"],
-      });
+      let occurrences = await Occurrence.find({});
       res.status(200).json({ success: true, occurrences: occurrences });
     }
   } catch (err) {
@@ -28,6 +28,7 @@ exports.findAll = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
+    console.log(req);
     if (req.loggedUserType !== "user") {
       return res.status(403).json({
         success: false,
