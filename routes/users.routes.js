@@ -16,18 +16,18 @@ router.use((req, res, next) => {
   next();
 });
 
-router
-  .route("/")
+router.route("/")
   .get(usersController.findAll)
   .get(authController.verifyToken, usersController.getAllUsers)
-  .post(usersController.create);
+  .post(usersController.createUser)
+  .post(authController.verifyToken, usersController.createAdmin);
 
-router
-  .route("/:userID")
+router.route("/:userID")
   .get(usersController.findOne)
   .delete(authController.verifyToken, usersController.deleteUser)
   .patch(authController.verifyToken, usersController.blockUser);
 
-router.route("/login").post(usersController.login);
+router.route("/login")
+  .post(usersController.login);
 
 module.exports = router;

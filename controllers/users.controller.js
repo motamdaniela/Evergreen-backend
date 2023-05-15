@@ -5,7 +5,7 @@ const db = require("../models");
 const { verifyToken } = require("./auth.controller.js");
 const User = db.users;
 
-exports.create = async (req, res) => {
+exports.createUser = async (req, res) => {
   try {
     if (!req.body && !req.body.username && !req.body.password)
       return res
@@ -13,30 +13,74 @@ exports.create = async (req, res) => {
         .json({ success: false, msg: "Username and password are mandatory" });
     // Save user to DB
     await User.create({
-      username: req.body.username,
+      type: "user",
       email: req.body.email,
-      // hash its password (8 = #rounds – more rounds, more time)
-      // password: req.body.password,
-      password: bcrypt.hashSync(req.body.password, 10),
-      type: req.body.type,
+      username: req.body.username,
       name: req.body.name,
+      // hash its password (8 = #rounds – more rounds, more time)
+      password: bcrypt.hashSync(req.body.password, 10),
       school: req.body.school,
+      previousLoginDate: 0,
+      loginDate: 0,
+      streak: 0,
+      received: false,
+      photo: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+      points: 0,
+      activitiesCompleted: 0,
+      occurencesDone: 0,
+      rewards: [],
+      state: "active",
+      council: false
     });
-    return res
-      .status(201)
-      .json({ success: true, msg: "User was registered successfully!" });
+    return res.status(201).json({ 
+      success: true, 
+      msg: "User was registered successfully!" 
+    });
   } catch (err) {
-    // if (err)
-    //   res
-    //     .status(400)
-    //     .json({ success: false, msg: err.errors.map((e) => e.message) });
-    // els;
     res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred while signing up.",
     });
   }
 };
+
+exports.createAdmin = async (req, res) => {
+  try {
+    if (req.loggedUserType !== "admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires ADMIN role!",
+      });
+    } else {
+      if (!req.body && !req.body.username && !req.body.password)
+        return res
+          .status(400)
+          .json({ success: false, msg: "Username and password are mandatory" });
+      // Save user to DB
+      await User.create({
+        type: "admin",
+        email: req.body.email,
+        username: req.body.username,
+        name: req.body.name,
+        password: bcrypt.hashSync(req.body.password, 10),
+        photo: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+        state: "active",
+        data: "data"
+      });
+      return res.status(201).json({ 
+        success: true, 
+        msg: "User was registered successfully!" 
+      });
+    }
+    
+  }
+  catch (err) {
+    res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred while signing up.",
+    });
+  }
+}
 
 exports.login = async (req, res) => {
   try {
@@ -154,7 +198,6 @@ exports.getAllUsers = async (req, res) => {
       success: false,
       msg: err.message || "Some error occurred while retrieving all users.",
     });
-    res.status(200).json({ success: true, users: users });
   }
 };
 
