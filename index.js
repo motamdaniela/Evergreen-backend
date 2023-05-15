@@ -1,5 +1,9 @@
 require("dotenv").config(); // read environment variables from .env file
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const bodyparser = require("body-parser");
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const cors = require("cors"); // middleware to enable CORS (Cross-Origin Resource Sharing)
 const app = express();
 const port = process.env.PORT; // use environment variables

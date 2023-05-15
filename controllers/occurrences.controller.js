@@ -7,8 +7,11 @@ const Occurrence = db.occurrences;
 
 exports.findAll = async (req, res) => {
   try {
-    console.log(req.loggedUserType);
-    if (req.loggedUserType == "user") {
+    // console.log(req.loggedUser.Role);
+    console.log(req.loggedUser.type);
+    // const verify = jwt.verify(req, config.SECRET);
+    // console.log(verify.type);
+    if (req.loggedUser.type == "user") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN/SECURITY role!",
@@ -29,7 +32,7 @@ exports.findAll = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     console.log(req);
-    if (req.loggedUserType !== "user") {
+    if (req.loggedUser.type !== "user") {
       return res.status(403).json({
         success: false,
         msg: "This request requires USER role!",
@@ -60,7 +63,10 @@ exports.create = async (req, res) => {
       });
       return res
         .status(201)
-        .json({ success: true, msg: "User was registered successfully!" });
+        .json({
+          success: true,
+          msg: "Occurrence was registered successfully!",
+        });
     }
   } catch (err) {
     res.status(500).json({
