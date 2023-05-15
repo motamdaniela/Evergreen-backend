@@ -25,11 +25,8 @@ router
 router
   .route("/:userID")
   .get(usersController.findOne)
-  .get(authController.verifyToken, usersController.getUser) // admin or logged user only
-  .delete(authController.verifyToken, usersController.deleteUser);
-
-// router.route("/admins").get(usersController.findAdmins);
-// router.route("/allusers").get(usersController.findUsers);
+  .delete(authController.verifyToken, usersController.deleteUser)
+  .patch(authController.verifyToken, usersController.blockUser);
 
 router.route("/login").post(usersController.login);
 

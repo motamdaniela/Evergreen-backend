@@ -1,4 +1,7 @@
 const db = require("../models");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const config = require("../config/db.config.js");
 const Mission = db.missions;
 // const Comment = db.comments;
 // Create and Save a new Comment into a certain tutorial:
@@ -10,6 +13,14 @@ exports.findAll = async (req, res) => {
   // let title = req.query.title;
 
   try {
+    // const token = jwt.verify({ id: user.id, type: user.type },
+    //   config.SECRET, { expiresIn: '24h' // 24 hours
+    // });
+    // return res.status(200).json({ 
+    //   success: true, 
+    //   accessToken: token 
+    // });
+
     //o utilizador deve ter sessão iniciada
     if (req.loggedUser){
       //utilozadores do tipo admin não devem ter acesso às missoes
