@@ -12,8 +12,8 @@ exports.createUser = async (req, res) => {
         .status(400)
         .json({ success: false, msg: "Username and password are mandatory" });
     // Save user to DB
+    let today = new Date();
     await User.create({
-      type: "user",
       email: req.body.email,
       username: req.body.username,
       name: req.body.name,
@@ -21,20 +21,28 @@ exports.createUser = async (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10),
       school: req.body.school,
       previousLoginDate: 0,
-      loginDate: 0,
+      loginDate: +(
+        today.getFullYear() +
+        "" +
+        ((today.getMonth() + 1).toString().length != 2
+          ? "0" + (today.getMonth() + 1)
+          : today.getMonth() + 1) +
+        "" +
+        (today.getDate().toString().length != 2
+          ? "0" + today.getDate()
+          : today.getDate())
+      ),
       streak: 0,
       received: false,
-      photo: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
       points: 0,
       activitiesCompleted: 0,
-      occurencesDone: 0,
+      occurrencesDone: 0,
       rewards: [],
-      state: "active",
-      council: false
+      council: false,
     });
-    return res.status(201).json({ 
-      success: true, 
-      msg: "User was registered successfully!" 
+    return res.status(201).json({
+      success: true,
+      msg: "User was registered successfully!",
     });
   } catch (err) {
     res.status(500).json({
@@ -46,41 +54,37 @@ exports.createUser = async (req, res) => {
 
 exports.createAdmin = async (req, res) => {
   try {
-    if (req.loggedUserType !== "admin") {
+    if (req.loggedUser.type !== "admin") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN role!",
       });
     } else {
-      if (!req.body && !req.body.username && !req.body.password)
-        return res
-          .status(400)
-          .json({ success: false, msg: "Username and password are mandatory" });
+      if (req.body.type !== "admin" && req.body.type !== "security")
+        return res.status(400).json({
+          success: false,
+          msg: "the only users you can create are type admin and security",
+        });
       // Save user to DB
       await User.create({
-        type: "admin",
+        type: req.body.type,
         email: req.body.email,
         username: req.body.username,
         name: req.body.name,
         password: bcrypt.hashSync(req.body.password, 10),
-        photo: "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
-        state: "active",
-        data: "data"
       });
-      return res.status(201).json({ 
-        success: true, 
-        msg: "User was registered successfully!" 
+      return res.status(201).json({
+        success: true,
+        msg: "User was registered successfully!",
       });
     }
-    
-  }
-  catch (err) {
+  } catch (err) {
     res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred while signing up.",
     });
   }
-}
+};
 
 exports.login = async (req, res) => {
   try {
@@ -130,12 +134,28 @@ exports.login = async (req, res) => {
 
 exports.findAll = async (req, res) => {
   try {
-    let data = await User.find({});
+    console.log(req.loggedUser);
+    if (req.loggedUser.type == "user") {
+      let users = await User.find({
+        type: "user",
+      }).exec();
+      res.status(200).json({ success: true, users: users });
+    } else if (req.loggedUser.type == "admin") {
+      let users = await User.find({});
+      res.status(200).json({ success: true, users: users });
+    } else {
+      return res.status(403).json({
+        success: false,
+        msg: "You don't have access to this",
+      });
+    }
 
-    return res.status(200).json({
-      success: true,
-      users: data,
-    });
+    // let data = await User.find({});
+
+    // return res.status(200).json({
+    //   success: true,
+    //   users: data,
+    // });
   } catch (err) {
     return res.status(500).json({
       success: false,
@@ -163,47 +183,9 @@ exports.findOne = async (req, res) => {
   }
 };
 
-// ? do we need this
-
-exports.findAdmins = async (req, res) => {
-  try {
-    let data = await User.find({ type: "admin" });
-
-    return res.status(200).json({
-      success: true,
-      users: data,
-    });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message || "Some error occurred",
-    });
-  }
-};
-
-exports.getAllUsers = async (req, res) => {
-  try {
-    if (req.loggedUserType !== "admin")
-      return res.status(403).json({
-        success: false,
-        msg: "This request requires ADMIN role!",
-      });
-    // do not expose users' sensitive data
-    let users = await User.findAll({
-      attributes: ["id", "username", "email", "type"],
-    });
-    res.status(200).json({ success: true, users: users });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      msg: err.message || "Some error occurred while retrieving all users.",
-    });
-  }
-};
-
 exports.deleteUser = async (req, res) => {
   try {
-    if (req.loggedUserType !== "admin") {
+    if (req.loggedUser.type !== "admin") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN role!",
@@ -237,7 +219,7 @@ exports.deleteUser = async (req, res) => {
 
 exports.blockUser = async (req, res) => {
   try {
-    if (req.loggedUserType !== "admin") {
+    if (req.loggedUser.type !== "admin") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN role!",

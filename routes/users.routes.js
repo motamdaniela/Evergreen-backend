@@ -16,10 +16,7 @@ router.use((req, res, next) => {
   next();
 });
 
-router
-  .route("/")
-  .get(usersController.findAll)
-  .post(authController.verifyToken, usersController.createAdmin);
+router.route("/").get(authController.verifyToken, usersController.findAll);
 
 router
   .route("/:userID")
@@ -30,5 +27,9 @@ router
 router.route("/login").post(usersController.login);
 
 router.route("/signup").post(usersController.createUser);
+
+router
+  .route("/createAdmin")
+  .post(authController.verifyToken, usersController.createAdmin);
 
 module.exports = router;

@@ -7,18 +7,22 @@ const Occurrence = db.occurrences;
 
 exports.findAll = async (req, res) => {
   try {
-    // console.log(req.loggedUser.Role);
-    console.log(req.loggedUser.type);
-    // const verify = jwt.verify(req, config.SECRET);
-    // console.log(verify.type);
     if (req.loggedUser.type == "user") {
-      return res.status(403).json({
-        success: false,
-        msg: "This request requires ADMIN/SECURITY role!",
-      });
-    } else {
+      let occurrences = await Occurrence.find({
+        userID: req.loggedUser.id,
+      }).exec();
+      res.status(200).json({ success: true, occurrences: occurrences });
+    } else if (
+      req.loggedUser.type == "admin" ||
+      req.loggedUser.type == "security"
+    ) {
       let occurrences = await Occurrence.find({});
       res.status(200).json({ success: true, occurrences: occurrences });
+    } else {
+      return res.status(403).json({
+        success: false,
+        msg: "You don't have access to this",
+      });
     }
   } catch (err) {
     res.status(500).json({
@@ -31,7 +35,6 @@ exports.findAll = async (req, res) => {
 
 exports.create = async (req, res) => {
   try {
-    console.log(req);
     if (req.loggedUser.type !== "user") {
       return res.status(403).json({
         success: false,
@@ -39,6 +42,7 @@ exports.create = async (req, res) => {
       });
     } else {
       let today = new Date();
+      console.log(req.loggedUser.id);
       await Occurrence.create({
         date:
           today.getDate() +
@@ -58,15 +62,13 @@ exports.create = async (req, res) => {
         type: req.body.type,
         description: req.body.description,
         photo: req.body.photo,
-        userID: req.loggedUserId,
+        userID: req.loggedUser.id,
         state: "pending",
       });
-      return res
-        .status(201)
-        .json({
-          success: true,
-          msg: "Occurrence was registered successfully!",
-        });
+      return res.status(201).json({
+        success: true,
+        msg: "Occurrence was registered successfully!",
+      });
     }
   } catch (err) {
     res.status(500).json({
@@ -79,7 +81,7 @@ exports.create = async (req, res) => {
 
 exports.findOne = async (req, res) => {
   try {
-    if (req.loggedUserType == "user") {
+    if (req.loggedUser.type == "user") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN/SECURITY role!",
@@ -99,7 +101,7 @@ exports.findOne = async (req, res) => {
 
 exports.validate = async (req, res) => {
   try {
-    if (req.loggedUserType == "user") {
+    if (req.loggedUser.type == "user") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN/SECURITY role!",

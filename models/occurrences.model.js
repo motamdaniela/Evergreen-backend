@@ -31,6 +31,6 @@ module.exports = (mongoose) => {
     },
     { timestamps: false }
   );
-  const Occurrence = mongoose.model("mission", schema);
+  const Occurrence = mongoose.model("occurrences", schema);
   return Occurrence;
 };

@@ -4,10 +4,10 @@ module.exports = (mongoose) => {
       type: {
         type: String,
         enum: {
-          values: ["user", "admin"],
+          values: ["user", "admin", "security"],
           message: "{VALUE} is not supported",
         },
-        defaultValue: "user",
+        default: "user",
         required: true,
         allowNull: false,
       },
@@ -23,24 +23,46 @@ module.exports = (mongoose) => {
         allowNull: false,
         required: true,
       },
-      name: String,
+      name: {
+        type: String,
+        allowNull: false,
+        required: true,
+      },
       password: {
         type: String,
         trim: true,
         allowNull: false,
         required: true,
       },
-      school: String,
+      school: {
+        type: String,
+        enum: {
+          values: ["ESMAD", "ESS", "ISEP"],
+          message: "{VALUE} is not supported",
+        },
+        allowNull: false,
+      },
       previousLoginDate: Number,
       loginDate: Number,
       streak: Number,
       received: Boolean,
-      photo: String,
+      photo: {
+        type: String,
+        default:
+          "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+      },
       points: Number,
       activitiesCompleted: Number,
       occurrencesDone: Number,
       rewards: Array,
-      state: String,
+      state: {
+        type: String,
+        enum: {
+          values: ["active", "blocked"],
+          message: "{VALUE} is not supported",
+        },
+        default: "active",
+      },
       council: Boolean,
     },
     { timestamps: false }
