@@ -17,7 +17,6 @@ module.exports = (mongoose) => {
           "Lixo no chão",
           "Outro",
         ],
-        defaultValue: "Lâmpada fundida",
       },
       description: String,
       photo: String,

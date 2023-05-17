@@ -29,6 +29,7 @@ db.mongoose = mongoose;
 // ?
 
 db.activities = require("./activities.model.js")(mongoose);
+db.suggestions = require("./activitysuggestions.model.js")(mongoose);
 db.missions = require("./missions.model.js")(mongoose);
 db.users = require("./users.model.js")(mongoose);
 db.occurrences = require("./occurrences.model.js")(mongoose);
