@@ -89,10 +89,11 @@ exports.subscribe = async (req, res) => {
 
 exports.verifyParticipation = async (req, res) => {
   try {
-    if (req.loggedUserRole !== "admin")
+    if (req.loggedUser.type !== "admin")
       return res.status(403).json({
         success: false, msg: "You’re not allowed to perform this request"
     });
+    
     const activity = await Activity.findById(req.params.activityID);
     if (activity === null){
       return res.status(404).json({
@@ -113,6 +114,7 @@ exports.verifyParticipation = async (req, res) => {
     }
     await activity.save();
     return res.json({ success: true, activity: activity });
+
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({
@@ -122,7 +124,8 @@ exports.verifyParticipation = async (req, res) => {
     }
     return res.status(500).json({
       success: false,
-      msg: `error retrieving activity with ID ${req.params.activityID}`,
+      msg: `some error has occurred`,
     });
   }
+
 };

@@ -17,9 +17,10 @@ router.use((req, res, next) => {
 });
 router.route("/").get(activitiesController.findAll);
 router.route("/:activityID").get(activitiesController.findOne);
+router.route("/:activityID/users/:userID").put(activitiesController.subscribe);
+
 router
-  .route("/:activityID/users/:userID")
-  .put(activitiesController.subscribe)
+  .route("/participation/:activityID/users/:userID")
   .put(authController.verifyToken, activitiesController.verifyParticipation);
 
 router
