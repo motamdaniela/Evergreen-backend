@@ -25,6 +25,6 @@ router
 
 router
   .route("/suggestion")
-  .post(authController.verifyToken, suggestionsController.findAll);
+  .post(authController.verifyToken, suggestionsController.create);
 
 module.exports = router;
