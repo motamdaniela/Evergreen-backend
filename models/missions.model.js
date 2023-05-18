@@ -1,7 +1,6 @@
 module.exports = (mongoose) => {
   const schema = mongoose.Schema(
     {
-      id: Number,
       title: String,
       description: String,
       reward: String,
