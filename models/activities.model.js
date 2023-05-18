@@ -1,14 +1,13 @@
 module.exports = (mongoose) => {
   const schema = mongoose.Schema({
-    id: Number,
     photo: String,
-    idTheme: Number,
+    idTheme: String,
     date: String,
     begin: Number,
     end: Number,
-    description: String,
+    description: Array,
     title: String,
-    coordinator: ObjectId,
+    coordinator: String,
     place: String,
     users: Array,
   });

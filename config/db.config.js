@@ -7,6 +7,4 @@ const config = {
 };
 config.URL = `mongodb+srv://${config.USER}:${config.PASSWORD}@${config.HOST}/${config.DB}?retryWrites=true&w=majority`;
 
-console.log(config.URL);
-
 module.exports = config;
