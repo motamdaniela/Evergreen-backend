@@ -56,65 +56,26 @@ exports.findOne = async (req, res) => {
 // ? subscribe / unsubscribe to activity
 exports.subscribe = async (req, res) => {
   try {
-    const activity = await Activity.findById(req.params.activityID);
-    if (activity === null)
-      return res.status(404).json({
-        success: false,
-        msg: `Cannot find any activity with ID ${req.params.activityID}`,
-      });
-
-    if (activity.users.find((id) => id == req.params.userID)) {
-      activity.users.splice(activity.users.indexOf(req.params.userID), 1);
-    } else {
-      activity.users.push(req.params.userID);
-    }
-    await activity.save();
-    return res.json({ success: true, activity: activity });
-  } catch (err) {
-    if (err.name === "CastError") {
-      return res.status(400).json({
-        success: false,
-        msg: "id parameter is not a valid object id",
-      });
-    }
-    return res.status(500).json({
-      success: false,
-      msg: `error retrieving activity with ID ${req.params.activityID}`,
-    });
-  }
-};
-
-
-//verify participation of users in activity
-
-exports.verifyParticipation = async (req, res) => {
-  try {
-    if (req.loggedUser.type !== "admin")
+    if (req.loggedUser.type !== "user") {
       return res.status(403).json({
-        success: false, msg: "You’re not allowed to perform this request"
-    });
-    
-    const activity = await Activity.findById(req.params.activityID);
-    if (activity === null){
-      return res.status(404).json({
         success: false,
-        msg: `Cannot find any activity with ID ${req.params.activityID}`,
+        msg: "This request requires USER role!",
       });
+    } else {
+      const activity = await Activity.findById(req.params.activityID);
+      if (activity.users.find((user) => user.id == req.loggedUser.id)) {
+        activity.users.splice(
+          activity.users.indexOf(
+            activity.users.find((user) => user.id == req.loggedUser.id)
+          ),
+          1
+        );
+      } else {
+        activity.users.push({ id: req.loggedUser.id, status: "subscribed" });
+      }
+      await activity.save();
+      return res.json({ success: true, activity: activity });
     }
-
-    const activityUser = activity.users.find({  user: req.params.userID  });
-    if (activityUser === null){
-      return res.status(404).json({
-        success: false,
-        msg: `user not subscribed to this activity`,
-      });
-    }
-    else{
-      activityUser.status = "participated";
-    }
-    await activity.save();
-    return res.json({ success: true, activity: activity });
-
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({
@@ -127,5 +88,42 @@ exports.verifyParticipation = async (req, res) => {
       msg: `some error has occurred`,
     });
   }
+};
 
+// ? verify participation of users in activity
+exports.verify = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires ADMIN role!",
+      });
+    } else {
+      const activity = await Activity.findById(req.params.activityID);
+      if (
+        activity.users.find(
+          (user) => user.id == req.params.userID && user.status == "subscribed"
+        )
+      ) {
+        activity.users.forEach((user) => {
+          if (user.id == req.params.userID && user.status == "subscribed") {
+            user.status = "participated";
+          }
+        });
+      }
+      Activity.updateOne({ _id: activity._id }, activity).exec();
+      return res.json({ success: true, activity: activity });
+    }
+  } catch (err) {
+    if (err.name === "CastError") {
+      return res.status(400).json({
+        success: false,
+        msg: "id parameter is not a valid object id",
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      msg: `some error has occurred`,
+    });
+  }
 };

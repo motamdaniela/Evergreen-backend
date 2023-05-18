@@ -16,12 +16,15 @@ router.use((req, res, next) => {
   next();
 });
 router.route("/").get(activitiesController.findAll);
-router.route("/:activityID").get(activitiesController.findOne);
-router.route("/:activityID/users/:userID").put(activitiesController.subscribe);
+
+router
+  .route("/:activityID")
+  .get(activitiesController.findOne)
+  .put(authController.verifyToken, activitiesController.subscribe);
 
 router
   .route("/participation/:activityID/users/:userID")
-  .put(authController.verifyToken, activitiesController.verifyParticipation);
+  .patch(authController.verifyToken, activitiesController.verify);
 
 router
   .route("/suggestion")
