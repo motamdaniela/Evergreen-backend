@@ -8,7 +8,7 @@ module.exports = (mongoose) => {
     end: Number,
     description: String,
     title: String,
-    coordinator: ObjectId,
+    coordinator: String,
     place: String,
     users: Array,
   });

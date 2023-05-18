@@ -149,13 +149,6 @@ exports.findAll = async (req, res) => {
         msg: "You don't have access to this",
       });
     }
-
-    // let data = await User.find({});
-
-    // return res.status(200).json({
-    //   success: true,
-    //   users: data,
-    // });
   } catch (err) {
     return res.status(500).json({
       success: false,
@@ -191,21 +184,16 @@ exports.deleteUser = async (req, res) => {
         msg: "This request requires ADMIN role!",
       });
     } else {
-      let users = await User.find({});
-      let index = users.indexOf(
-        users.find((user) => user.id === req.params.userID)
-      );
-
-      if (index > -1) {
-        users.splice(index, 1);
-        return res.status(200).json({
-          success: true,
-          users: users,
-        });
-      } else {
+      const user = await User.findByIdAndDelete(req.params.userID)
+      if (!user) {
         return res.status(404).json({
           success: false,
-          message: `Cannot find user with id ${req.params.userID}`,
+          message: "User does not exist"
+        })
+      } else {
+        return res.status(200).json({
+          success: true,
+          message: `User with id ${req.params.userID} was deleted successfully`
         });
       }
     }
