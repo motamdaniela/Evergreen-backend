@@ -214,12 +214,20 @@ exports.blockUser = async (req, res) => {
       });
     } else {
       let user = await User.findById(req.params.userID);
-      user.state = req.body.state;
-      await user.save();
-      return res.status(200).json({
-        success: true,
-        user: user,
-      });
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User does not exist"
+        })
+      } else {
+        user.state = req.body.state;
+        await user.save();
+        return res.status(200).json({
+          success: true,
+          message: "User was blocked successfully",
+          user: user
+        });
+      }
     }
   } catch (err) {
     return res.status(500).json({
@@ -228,3 +236,31 @@ exports.blockUser = async (req, res) => {
     });
   }
 };
+
+exports.editProfile = async (req, res) => {
+  try {
+    let user = await User.findById(req.params.userID);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User does not exist"
+      })
+    } else {
+      user.username = req.body.username
+      user.photo = req.body.photo
+      user.password = bcrypt.hashSync(req.body.password, 10)
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "User was edited successfully",
+        user: user
+      });
+    }
+  }
+  catch (err){
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+}

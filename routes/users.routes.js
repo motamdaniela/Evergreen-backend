@@ -18,18 +18,19 @@ router.use((req, res, next) => {
 
 router.route("/").get(authController.verifyToken, usersController.findAll);
 
-router
-  .route("/:userID")
+router.route("/:userID")
   .get(usersController.findOne)
   .delete(authController.verifyToken, usersController.deleteUser)
-  .patch(authController.verifyToken, usersController.blockUser);
+  .patch(authController.verifyToken, usersController.blockUser)
+
+router.route("/:userID/edit").patch(usersController.editProfile);
 
 router.route("/login").post(usersController.login);
 
 router.route("/signup").post(usersController.createUser);
 
-router
-  .route("/createAdmin")
+router.route("/createAdmin")
   .post(authController.verifyToken, usersController.createAdmin);
+
 
 module.exports = router;
