@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const config = require("../config/db.config.js");
 const db = require("../models");
-const { verifyToken } = require("./auth.controller.js");
 const User = db.users;
 
 exports.createUser = async (req, res) => {
@@ -60,23 +59,25 @@ exports.createAdmin = async (req, res) => {
         msg: "This request requires ADMIN role!",
       });
     } else {
-      if (req.body.type !== "admin" && req.body.type !== "security")
+      if (req.body.type !== "admin" && req.body.type !== "security") {
         return res.status(400).json({
           success: false,
           msg: "the only users you can create are type admin and security",
         });
-      // Save user to DB
-      await User.create({
-        type: req.body.type,
-        email: req.body.email,
-        username: req.body.username,
-        name: req.body.name,
-        password: bcrypt.hashSync(req.body.password, 10),
-      });
-      return res.status(201).json({
-        success: true,
-        msg: "User was registered successfully!",
-      });
+      } else {
+        // Save user to DB
+        await User.create({
+          type: req.body.type,
+          email: req.body.email,
+          username: req.body.username,
+          name: req.body.name,
+          password: bcrypt.hashSync(req.body.password, 10),
+        });
+        return res.status(201).json({
+          success: true,
+          msg: "User was registered successfully!",
+        });
+      }
     }
   } catch (err) {
     res.status(500).json({

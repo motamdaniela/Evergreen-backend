@@ -1,8 +1,4 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const config = require("../config/db.config.js");
 const db = require("../models");
-const { verifyToken } = require("./auth.controller.js");
 const Occurrence = db.occurrences;
 
 exports.findAll = async (req, res) => {
