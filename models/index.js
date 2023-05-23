@@ -20,4 +20,5 @@ db.suggestions = require("./activitysuggestions.model.js")(mongoose);
 db.missions = require("./missions.model.js")(mongoose);
 db.users = require("./users.model.js")(mongoose);
 db.occurrences = require("./occurrences.model.js")(mongoose);
+db.themes = require("./themes.model.js")(mongoose);
 module.exports = db;

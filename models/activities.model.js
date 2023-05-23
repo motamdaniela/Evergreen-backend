@@ -7,7 +7,7 @@ module.exports = (mongoose) => {
     end: Number,
     description: Array,
     title: String,
-    coordinator: String,
+    coordinator: mongoose.Schema.Types.ObjectId,
     place: String,
     users: Array,
   });

@@ -3,15 +3,6 @@ module.exports = (mongoose) => {
     {
       theme: {
         type: String,
-        enum: [
-          "Água",
-          "Resíduos",
-          "Energia",
-          "Espaços exteriores",
-          "Mar",
-          "Mobilidade",
-          "Outros",
-        ],
         required: true,
         allowNull: false,
       },
@@ -36,7 +27,7 @@ module.exports = (mongoose) => {
         required: true,
       },
       userID: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
         allowNull: false,
         required: true,
       },

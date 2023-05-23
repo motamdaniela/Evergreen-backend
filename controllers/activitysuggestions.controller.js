@@ -1,9 +1,6 @@
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const config = require("../config/db.config.js");
 const db = require("../models");
-const { verifyToken } = require("./auth.controller.js");
 const Suggestion = db.suggestions;
+const Theme = db.themes;
 
 exports.create = async (req, res) => {
   try {
@@ -13,18 +10,26 @@ exports.create = async (req, res) => {
         msg: "This request requires USER role!",
       });
     } else {
-      await Suggestion.create({
-        theme: req.body.theme,
-        description: req.body.description,
-        objectives: req.body.objectives,
-        goals: req.body.goals,
-        resources: req.body.resources,
-        userID: req.loggedUser.id,
-      });
-      return res.status(201).json({
-        success: true,
-        msg: "Suggestion was registered successfully!",
-      });
+      let themes = await Theme.find();
+      if (themes.find((theme) => theme.name == req.body.theme)) {
+        await Suggestion.create({
+          theme: req.body.theme,
+          description: req.body.description,
+          objectives: req.body.objectives,
+          goals: req.body.goals,
+          resources: req.body.resources,
+          userID: req.loggedUser.id,
+        });
+        return res.status(201).json({
+          success: true,
+          msg: "Suggestion was registered successfully!",
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          msg: err.message || "Invalid theme",
+        });
+      }
     }
   } catch (err) {
     res.status(500).json({

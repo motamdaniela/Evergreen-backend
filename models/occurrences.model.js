@@ -1,11 +1,35 @@
+// let mongoose = require("mongoose");
+
+// let Schema = mongoose.Schema,
+//   ObjectId = Schema.ObjectId;
 module.exports = (mongoose) => {
   const schema = mongoose.Schema(
     {
-      date: String,
-      hour: String,
-      school: String,
-      building: String,
-      classroom: Number,
+      date: {
+        type: String,
+        allowNull: false,
+        required: true,
+      },
+      hour: {
+        type: String,
+        allowNull: false,
+        required: true,
+      },
+      school: {
+        type: String,
+        allowNull: false,
+        required: true,
+      },
+      building: {
+        type: String,
+        allowNull: false,
+        required: true,
+      },
+      classroom: {
+        type: Number,
+        allowNull: false,
+        required: true,
+      },
       type: {
         type: String,
         enum: [
@@ -18,15 +42,30 @@ module.exports = (mongoose) => {
           "Outro",
         ],
       },
-      description: String,
-      photo: String,
-      userID: String,
+      description: {
+        type: String,
+        allowNull: false,
+        required: true,
+      },
+      photo: {
+        type: String,
+        allowNull: false,
+        required: true,
+      },
+      userID: {
+        type: mongoose.Schema.Types.ObjectId,
+        allowNull: false,
+        required: true,
+      },
       state: {
         type: String,
         enum: ["pending", "solved", "repeat", "invalid"],
         defaultValue: "pending",
       },
-      other: String,
+      other: {
+        type: String,
+        allowNull: false,
+      },
     },
     { timestamps: false }
   );

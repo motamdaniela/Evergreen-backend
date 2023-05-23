@@ -1,19 +1,14 @@
 const db = require("../models");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const config = require("../config/db.config.js");
 const Activity = db.activities;
-const User = db.users;
+const Theme = db.themes;
 
 // ? gets all activities
 exports.findAll = async (req, res) => {
-  let idT = req.query.idTheme;
-  // console.log(idTheme);
+  let theme = await Theme.findById(req.query.idTheme);
   let condition = {};
-  if (idT != undefined) {
-    condition = { idTheme: idT };
+  if (theme != undefined) {
+    condition = { idTheme: theme._id };
   }
-  // let condition = idTheme ? { idTheme: new RegExp(idTheme, "i") } : {};
   try {
     let data = await Activity.find(condition);
 
