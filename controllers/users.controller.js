@@ -184,16 +184,16 @@ exports.deleteUser = async (req, res) => {
         msg: "This request requires ADMIN role!",
       });
     } else {
-      const user = await User.findByIdAndDelete(req.params.userID)
+      const user = await User.findByIdAndDelete(req.params.userID);
       if (!user) {
         return res.status(404).json({
           success: false,
-          message: "User does not exist"
-        })
+          message: "User does not exist",
+        });
       } else {
         return res.status(200).json({
           success: true,
-          message: `User with id ${req.params.userID} was deleted successfully`
+          message: `User with id ${req.params.userID} was deleted successfully`,
         });
       }
     }
@@ -217,15 +217,15 @@ exports.blockUser = async (req, res) => {
       if (!user) {
         return res.status(404).json({
           success: false,
-          message: "User does not exist"
-        })
+          message: "User does not exist",
+        });
       } else {
         user.state = req.body.state;
         await user.save();
         return res.status(200).json({
           success: true,
           message: "User was blocked successfully",
-          user: user
+          user: user,
         });
       }
     }
@@ -243,24 +243,53 @@ exports.editProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User does not exist"
-      })
+        message: "User does not exist",
+      });
     } else {
-      user.username = req.body.username
-      user.photo = req.body.photo
-      user.password = bcrypt.hashSync(req.body.password, 10)
+      user.username = req.body.username;
+      user.photo = req.body.photo;
+      user.password = bcrypt.hashSync(req.body.password, 10);
       await user.save();
       return res.status(200).json({
         success: true,
         message: "User was edited successfully",
-        user: user
+        user: user,
       });
     }
-  }
-  catch (err){
+  } catch (err) {
     return res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred",
     });
   }
-}
+};
+
+exports.subscribeCouncil = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "user") {
+      console.log("user");
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires USER role!",
+      });
+    } else {
+      let user = await User.findById(req.loggedUser.id);
+      if (user.council) {
+        user.council = false;
+      } else {
+        user.council = true;
+      }
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "subscribed successfully",
+        user: user,
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};

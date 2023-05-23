@@ -15,20 +15,11 @@ router.use((req, res, next) => {
   });
   next();
 });
-router.route("/").get(authController.verifyToken, missionsController.findAll);
+router
+  .route("/")
+  .get(authController.verifyToken, missionsController.findAll)
+  .patch(authController.verifyToken, missionsController.receiveBadge);
 
-router.route("/:missionID")
-  .get(missionsController.findOne)
-  // .patch(missionsController.update)
-
-
-// router.route("/").get(missionsController.findAll);
-// router.route("/:missionID").get(missionsController.findOne);
-
-// router.route("/:missionID/users/:userID").put(missionsController.addBadge);
-
-// router.all("*", (req, res) => {
-//   res.status(404).json({ message: "what???" });
-// });
+router.route("/:missionID").get(missionsController.findOne);
 
 module.exports = router;

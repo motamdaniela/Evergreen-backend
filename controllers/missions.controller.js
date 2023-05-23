@@ -47,3 +47,27 @@ exports.findOne = async (req, res) => {
     }
   }
 };
+
+exports.receiveBadge = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "user") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires USER role!",
+      });
+    } else {
+      let user = await User.findById(req.loggedUser.id);
+      let mission = await Mission.findOne({ reward: req.body.badge });
+      if (!user.rewards.find((badge) => badge == req.body.badge) && mission) {
+        user.rewards.push(req.body.badge);
+      }
+      await user.save();
+      return res.json({ success: true, user: user });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};
