@@ -6,12 +6,39 @@ const User = db.users;
 
 exports.createUser = async (req, res) => {
   try {
-    if (!req.body && !req.body.username && !req.body.password)
+    let arr = [
+      req.body.email,
+      req.body.username,
+      req.body.name,
+      req.body.password,
+      req.body.school,
+    ];
+    let keys = Object.keys(req.body);
+    for (let i = 0; i < arr.length; i++) {
+      if (!arr[i] || !arr[i].replace(/\s/g, "").length) {
+        return res
+          .status(400)
+          .json({ success: false, msg: `Please provide ${keys[i]}!` });
+      }
+    }
+    if (!req.body.password == req.body.confPassword) {
+      return res.status(403).json({
+        success: false,
+        msg: `The passwords that you provided don't match!`,
+      });
+    }
+    if ((await User.find({ email: req.body.email })).length > 0) {
       return res
-        .status(400)
-        .json({ success: false, msg: "Username and password are mandatory" });
-    // Save user to DB
+        .status(409)
+        .json({ success: false, msg: `Email already in use!` });
+    } else if ((await User.find({ username: req.body.username })).length > 0) {
+      return res
+        .status(409)
+        .json({ success: false, msg: `Username already in use!` });
+    }
+
     let today = new Date();
+    // Save user to DB
     await User.create({
       email: req.body.email,
       username: req.body.username,
@@ -64,20 +91,53 @@ exports.createAdmin = async (req, res) => {
           success: false,
           msg: "the only users you can create are type admin and security",
         });
-      } else {
-        // Save user to DB
-        await User.create({
-          type: req.body.type,
-          email: req.body.email,
-          username: req.body.username,
-          name: req.body.name,
-          password: bcrypt.hashSync(req.body.password, 10),
-        });
-        return res.status(201).json({
-          success: true,
-          msg: "User was registered successfully!",
+      }
+      let arr = [
+        req.body.type,
+        req.body.email,
+        req.body.username,
+        req.body.name,
+        req.body.password,
+      ];
+
+      let keys = Object.keys(req.body);
+      for (let i = 0; i < arr.length; i++) {
+        if (!arr[i] || !arr[i].replace(/\s/g, "").length) {
+          return res
+            .status(400)
+            .json({ success: false, msg: `Please provide ${keys[i]}!` });
+        }
+      }
+      if (!req.body.password == req.body.confPassword) {
+        return res.status(403).json({
+          success: false,
+          msg: `The passwords that you provided don't match!`,
         });
       }
+
+      if ((await User.find({ email: req.body.email })).length > 0) {
+        return res
+          .status(409)
+          .json({ success: false, msg: `Email already in use!` });
+      } else if (
+        (await User.find({ username: req.body.username })).length > 0
+      ) {
+        return res
+          .status(409)
+          .json({ success: false, msg: `Username already in use!` });
+      }
+      // Save user to DB
+      await User.create({
+        type: req.body.type,
+        email: req.body.email,
+        username: req.body.username,
+        name: req.body.name,
+        password: bcrypt.hashSync(req.body.password, 10),
+      });
+      return res.status(201).json({
+        success: true,
+        msg: "User was registered successfully!",
+      });
     }
   } catch (err) {
     res.status(500).json({
@@ -158,24 +218,24 @@ exports.findAll = async (req, res) => {
   }
 };
 
-exports.findOne = async (req, res) => {
-  try {
-    const user = await User.findById(req.params.userID);
+// exports.findOne = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.params.userID);
 
-    if (user === null) {
-      return res.status(404).json({
-        success: false,
-        message: `Cannot find user with id ${req.params.userID}`,
-      });
-    }
-    return res.json({ success: true, user: user });
-  } catch (err) {
-    return res.status(500).json({
-      success: false,
-      msg: err.message || "Some error occurred",
-    });
-  }
-};
+//     if (user === null) {
+//       return res.status(404).json({
+//         success: false,
+//         message: `Cannot find user with id ${req.params.userID}`,
+//       });
+//     }
+//     return res.json({ success: true, user: user });
+//   } catch (err) {
+//     return res.status(500).json({
+//       success: false,
+//       msg: err.message || "Some error occurred",
+//     });
+//   }
+// };
 
 exports.deleteUser = async (req, res) => {
   try {

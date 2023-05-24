@@ -15,6 +15,9 @@ exports.verifyToken = (req, res, next) => {
     req.loggedUser = { id: decoded.id, type: decoded.type }; // save user ID and role into request object
     next();
   } catch (err) {
-    return res.status(401).json({ success: false, msg: "Unauthorized!" });
+    return res.status(401).json({
+      success: false,
+      msg: "You must be authenticated to perform this request!",
+    });
   }
 };

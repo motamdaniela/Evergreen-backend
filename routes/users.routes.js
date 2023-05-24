@@ -23,7 +23,7 @@ router
   .patch(authController.verifyToken, usersController.subscribeCouncil);
 router
   .route("/:userID")
-  .get(usersController.findOne)
+  // .get(usersController.findOne)
   .delete(authController.verifyToken, usersController.deleteUser)
   .patch(authController.verifyToken, usersController.blockUser);
 
