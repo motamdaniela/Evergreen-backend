@@ -62,6 +62,8 @@ module.exports = (mongoose) => {
           message: "{VALUE} is not supported",
         },
         default: "active",
+        allowNull: false,
+        required: true,
       },
       council: Boolean,
     },

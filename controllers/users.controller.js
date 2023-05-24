@@ -22,12 +22,26 @@ exports.createUser = async (req, res) => {
           .json({ success: false, msg: `Please provide ${keys[i]}!` });
       }
     }
+    if (/\s/g.test(req.body.username)) {
+      return res.status(400).json({
+        success: false,
+        msg: `Your username can't contain spaces!`,
+      });
+    }
+
+    if (/\s/g.test(req.body.password)) {
+      return res.status(400).json({
+        success: false,
+        msg: `Your password can't contain spaces!`,
+      });
+    }
     if (!req.body.password == req.body.confPassword) {
       return res.status(403).json({
         success: false,
         msg: `The passwords that you provided don't match!`,
       });
     }
+
     if ((await User.find({ email: req.body.email })).length > 0) {
       return res
         .status(409)
@@ -109,6 +123,19 @@ exports.createAdmin = async (req, res) => {
             .status(400)
             .json({ success: false, msg: `Please provide ${keys[i]}!` });
         }
+      }
+      if (/\s/g.test(req.body.username)) {
+        return res.status(400).json({
+          success: false,
+          msg: `Your username can't contain spaces!`,
+        });
+      }
+
+      if (/\s/g.test(req.body.password)) {
+        return res.status(400).json({
+          success: false,
+          msg: `Your password can't contain spaces!`,
+        });
       }
       if (!req.body.password == req.body.confPassword) {
         return res.status(403).json({
@@ -224,25 +251,6 @@ exports.findAll = async (req, res) => {
   }
 };
 
-// exports.findOne = async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.userID);
-
-//     if (user === null) {
-//       return res.status(404).json({
-//         success: false,
-//         message: `Cannot find user with id ${req.params.userID}`,
-//       });
-//     }
-//     return res.json({ success: true, user: user });
-//   } catch (err) {
-//     return res.status(500).json({
-//       success: false,
-//       msg: err.message || "Some error occurred",
-//     });
-//   }
-// };
-
 // ? delete user
 exports.deleteUser = async (req, res) => {
   try {
@@ -306,6 +314,46 @@ exports.blockUser = async (req, res) => {
   }
 };
 
+// ? edit user password
+exports.editUser = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires ADMIN role!",
+      });
+    } else {
+      let user = await User.findById(req.params.userID);
+      if (req.body.password && req.body.password.replace(/\s/g, "").length) {
+        if (/\s/g.test(req.body.password)) {
+          return res.status(400).json({
+            success: false,
+            msg: `Your password can't contain spaces!`,
+          });
+        }
+        if (req.body.password == req.body.confPassword) {
+          user.password = bcrypt.hashSync(req.body.password, 10);
+        } else {
+          return res.status(403).json({
+            success: false,
+            msg: `The passwords that you provided don't match!`,
+          });
+        }
+      } else {
+        return res.status(400).json({
+          success: false,
+          msg: `Please provide a valid password!`,
+        });
+      }
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};
+
 // ? edit user profile
 exports.editProfile = async (req, res) => {
   try {
@@ -330,7 +378,20 @@ exports.editProfile = async (req, res) => {
         user.photo = req.body.photo;
       }
       if (req.body.password && req.body.password.replace(/\s/g, "").length) {
-        user.password = bcrypt.hashSync(req.body.password, 10);
+        if (/\s/g.test(req.body.password)) {
+          return res.status(400).json({
+            success: false,
+            msg: `Your password can't contain spaces!`,
+          });
+        }
+        if (req.body.password == req.body.confPassword) {
+          user.password = bcrypt.hashSync(req.body.password, 10);
+        } else {
+          return res.status(403).json({
+            success: false,
+            msg: `The passwords that you provided don't match!`,
+          });
+        }
       }
       await user.save();
       return res.status(200).json({
@@ -371,7 +432,7 @@ exports.subscribeCouncil = async (req, res) => {
       await user.save();
       return res.status(200).json({
         success: true,
-        message: "subscribed successfully",
+        message: "Subscribed successfully!",
         user: user,
       });
     }
