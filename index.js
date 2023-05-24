@@ -23,3 +23,7 @@ app.all("*", function (req, res) {
 app.listen(port, host, () =>
   console.log(`App listening at http://${host}:${port}/`)
 );
+
+// ? para dizer o que ta feito
+// ! para dizer que ta mal /  incompleto
+// * explicar coisas

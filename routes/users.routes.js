@@ -27,7 +27,9 @@ router
   .delete(authController.verifyToken, usersController.deleteUser)
   .patch(authController.verifyToken, usersController.blockUser);
 
-router.route("/:userID/edit").patch(usersController.editProfile);
+router
+  .route("/edit/:userID")
+  .patch(authController.verifyToken, usersController.editProfile);
 
 router.route("/login").post(usersController.login);
 

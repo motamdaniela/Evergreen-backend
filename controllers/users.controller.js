@@ -4,6 +4,7 @@ const config = require("../config/db.config.js");
 const db = require("../models");
 const User = db.users;
 
+// ? sign up
 exports.createUser = async (req, res) => {
   try {
     let arr = [
@@ -78,6 +79,7 @@ exports.createUser = async (req, res) => {
   }
 };
 
+// ? create admin
 exports.createAdmin = async (req, res) => {
   try {
     if (req.loggedUser.type !== "admin") {
@@ -147,6 +149,7 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
+// ? login
 exports.login = async (req, res) => {
   try {
     if (!req.body || !req.body.username || !req.body.password)
@@ -193,14 +196,17 @@ exports.login = async (req, res) => {
   }
 };
 
+// ? find all users
 exports.findAll = async (req, res) => {
   try {
-    console.log(req.loggedUser);
+    // * if logged user type=user, only finds user type=user
     if (req.loggedUser.type == "user") {
       let users = await User.find({
         type: "user",
       }).exec();
       res.status(200).json({ success: true, users: users });
+
+      // * if logged user type=admin, finds all users
     } else if (req.loggedUser.type == "admin") {
       let users = await User.find({});
       res.status(200).json({ success: true, users: users });
@@ -237,6 +243,7 @@ exports.findAll = async (req, res) => {
 //   }
 // };
 
+// ? delete user
 exports.deleteUser = async (req, res) => {
   try {
     if (req.loggedUser.type !== "admin") {
@@ -266,6 +273,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+// ? block user
 exports.blockUser = async (req, res) => {
   try {
     if (req.loggedUser.type !== "admin") {
@@ -298,23 +306,42 @@ exports.blockUser = async (req, res) => {
   }
 };
 
+// ? edit user profile
 exports.editProfile = async (req, res) => {
   try {
-    let user = await User.findById(req.params.userID);
-    if (!user) {
-      return res.status(404).json({
+    if (req.loggedUser.type !== "user") {
+      return res.status(403).json({
         success: false,
-        message: "User does not exist",
+        msg: "This request requires USER role!",
       });
-    } else {
-      user.username = req.body.username;
-      user.photo = req.body.photo;
-      user.password = bcrypt.hashSync(req.body.password, 10);
+    }
+    let user = await User.findById(req.params.userID);
+    if (user._id == req.loggedUser.id) {
+      if (req.body.username && req.body.username.replace(/\s/g, "").length) {
+        if ((await User.find({ username: req.body.username })).length > 0) {
+          return res
+            .status(409)
+            .json({ success: false, msg: `Username already in use!` });
+        } else {
+          user.username = req.body.username;
+        }
+      }
+      if (req.body.photo && req.body.photo.replace(/\s/g, "").length) {
+        user.photo = req.body.photo;
+      }
+      if (req.body.password && req.body.password.replace(/\s/g, "").length) {
+        user.password = bcrypt.hashSync(req.body.password, 10);
+      }
       await user.save();
       return res.status(200).json({
         success: true,
         message: "User was edited successfully",
         user: user,
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: "You can't edit this user",
       });
     }
   } catch (err) {
@@ -325,6 +352,7 @@ exports.editProfile = async (req, res) => {
   }
 };
 
+// ? subscribe council
 exports.subscribeCouncil = async (req, res) => {
   try {
     if (req.loggedUser.type !== "user") {
