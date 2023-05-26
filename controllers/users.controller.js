@@ -176,7 +176,47 @@ exports.createAdmin = async (req, res) => {
   }
 };
 
+function streak(user) {
+  let today = new Date();
+  user.previousLoginDate = +user.loginDate;
+  user.loginDate = +(
+    today.getFullYear() +
+    "" +
+    ((today.getMonth() + 1).toString().length != 2
+      ? "0" + (today.getMonth() + 1)
+      : today.getMonth() + 1) +
+    "" +
+    (today.getDate().toString().length != 2
+      ? "0" + today.getDate()
+      : today.getDate())
+  );
+  let yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  let yesterdayDate = +(
+    yesterday.getFullYear() +
+    "" +
+    ((yesterday.getMonth() + 1).toString().length < 2
+      ? "0" + (yesterday.getMonth() + 1)
+      : yesterday.getMonth() + 1) +
+    "" +
+    (yesterday.getDate().toString().length < 2
+      ? "0" + yesterday.getDate()
+      : yesterday.getDate())
+  );
+  if (+user.previousLoginDate == +yesterdayDate) {
+    user.streak += 1;
+    user.received = false;
+  } else if (+user.previousLoginDate < +user.loginDate) {
+    user.streak = 1;
+    user.received = false;
+  }
+  User.updateOne({ _id: user._id }, user).exec();
+}
+
+module.exports = streak;
+
 // ? login
+// ! tenho de mudar aqui o previous login date???
 exports.login = async (req, res) => {
   try {
     if (!req.body || !req.body.username || !req.body.password)
@@ -205,6 +245,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ id: user.id, type: user.type }, config.SECRET, {
       expiresIn: "24h", // 24 hours
     });
+    streak(user);
     return res.status(200).json({
       success: true,
       accessToken: token,
