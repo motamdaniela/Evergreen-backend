@@ -259,7 +259,7 @@ exports.deleteUser = async (req, res) => {
           message: "User does not exist",
         });
       } else {
-        return res.status(200).json({
+        return res.status(204).json({
           success: true,
           message: `User with id ${req.params.userID} was deleted successfully`,
         });
@@ -293,7 +293,7 @@ exports.blockUser = async (req, res) => {
         await user.save();
         return res.status(200).json({
           success: true,
-          message: "User was blocked successfully",
+          message: "User state was changed successfully",
           user: user,
         });
       }
