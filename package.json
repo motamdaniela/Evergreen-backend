@@ -30,6 +30,10 @@
     "mongoose": "^7.1.1"
   },
   "devDependencies": {
+    "jest": "^29.5.0",
     "nodemon": "^2.0.22"
+  },
+  "scripts": {
+    "test": "jest"
   }
 }
