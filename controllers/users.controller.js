@@ -204,16 +204,19 @@ function streak(user) {
       : yesterday.getDate())
   );
   if (+user.previousLoginDate == +yesterdayDate) {
-    user.streak += 1;
-    user.received = false;
+    if (user.streak == 7) {
+      user.streak = 1;
+      user.received = false;
+    } else {
+      user.streak += 1;
+      user.received = false;
+    }
   } else if (+user.previousLoginDate < +user.loginDate) {
     user.streak = 1;
     user.received = false;
   }
   User.updateOne({ _id: user._id }, user).exec();
 }
-
-module.exports = streak;
 
 // ? login
 // ! tenho de mudar aqui o previous login date???
@@ -361,7 +364,7 @@ exports.editUser = async (req, res) => {
     if (req.loggedUser.type !== "admin") {
       return res.status(403).json({
         success: false,
-        msg: "This request requires ADMIN role!",
+        msg: "This request requires Admin role!",
       });
     } else {
       let user = await User.findById(req.params.userID);
@@ -474,6 +477,76 @@ exports.subscribeCouncil = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: "Subscribed successfully!",
+        user: user,
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};
+
+// ? receive daily reward
+exports.receiveReward = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "user") {
+      console.log("user");
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires USER role!",
+      });
+    }
+    let points = [
+      {
+        points: 1,
+        badge: "idk1",
+      },
+      {
+        points: 3,
+        badge: "idk2",
+      },
+      {
+        points: 5,
+        badge: "idk3",
+      },
+      {
+        points: 8,
+        badge: "idk4",
+      },
+      {
+        points: 10,
+        badge: "idk5",
+      },
+      {
+        points: 15,
+        badge: "idk6",
+      },
+      {
+        points: 20,
+        badge: "idk7",
+      },
+    ];
+    let user = await User.findById(req.loggedUser.id);
+    if (user.received == false) {
+      points.forEach((point) => {
+        if (points.indexOf(point) == user.streak) {
+          user.point += point.points;
+          user.rewards.push(point.badge);
+        }
+      });
+      user.received = true;
+      await user.save();
+      return res.status(200).json({
+        success: true,
+        message: "success!",
+        user: user,
+      });
+    } else {
+      return res.status(403).json({
+        success: false,
+        message: "You already received today's reward!",
         user: user,
       });
     }

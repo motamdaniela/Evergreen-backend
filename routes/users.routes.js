@@ -19,6 +19,10 @@ router.use((req, res, next) => {
 router.route("/").get(authController.verifyToken, usersController.findAll);
 
 router
+  .route("/dailyReward")
+  .patch(authController.verifyToken, usersController.receiveReward);
+
+router
   .route("/council")
   .patch(authController.verifyToken, usersController.subscribeCouncil);
 router
