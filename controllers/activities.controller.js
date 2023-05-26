@@ -1,6 +1,7 @@
 const db = require("../models");
 const Activity = db.activities;
 const Theme = db.themes;
+const User = db.users;
 
 // ? gets all activities
 exports.findAll = async (req, res) => {
@@ -10,12 +11,50 @@ exports.findAll = async (req, res) => {
     condition = { idTheme: theme._id };
   }
   try {
-    let data = await Activity.find(condition);
+    if (req.loggedUser.type == "user") {
+      let data = await Activity.find(condition);
 
-    return res.status(200).json({
-      success: true,
-      activities: data,
+      return res.status(200).json({
+        success: true,
+        activities: data,
+      });
+    } else {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires USER role!",
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
     });
+  }
+};
+
+// ? gets all activities that you are the coordinator of
+exports.findAllCoordinator = async (req, res) => {
+  try {
+    if (req.loggedUser.type == "user" || req.loggedUser.type == "admin") {
+      let activities = await Activity.find({ coordinator: req.loggedUser.id });
+      if (activities.length > 0) {
+        return res.status(200).json({
+          success: true,
+          num: activities.length,
+          activities: activities,
+        });
+      } else {
+        return res.status(403).json({
+          success: false,
+          msg: "You are not the coordinator of any activity!",
+        });
+      }
+    } else {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires USER or ADMIN role!",
+      });
+    }
   } catch (err) {
     return res.status(500).json({
       success: false,

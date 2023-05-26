@@ -1,5 +1,6 @@
 const db = require("../models");
 const Occurrence = db.occurrences;
+const School = db.schools;
 
 exports.findAll = async (req, res) => {
   try {
@@ -37,6 +38,36 @@ exports.create = async (req, res) => {
         msg: "This request requires USER role!",
       });
     } else {
+      let arr = [
+        req.body.school,
+        req.body.building,
+        req.body.classroom,
+        req.body.type,
+        req.body.description,
+        req.body.photo,
+      ];
+      let keys = Object.keys(req.body);
+      for (let i = 0; i < arr.length; i++) {
+        if (!arr[i] || !arr[i].replace(/\s/g, "").length) {
+          console.log(keys[i]);
+          return res
+            .status(400)
+            .json({ success: false, msg: `Please provide ${keys[i]}` })
+        }
+      }  
+
+      let school = await School.findOne({name: req.body.school});
+      // console.log(school);
+      if(school.length == 0) {
+        return res.status(400).json({ success: false, message: "School does not exist" });
+      } 
+
+      let building = school.buildings.find(building => building.name == req.body.building)
+      console.log (building)
+      if(building.length == 0) {
+        return res.status(400).json({ success: false, message: "Building does not exist" });
+      } 
+      
       let today = new Date();
       console.log(req.loggedUser.id);
       await Occurrence.create({
@@ -60,11 +91,11 @@ exports.create = async (req, res) => {
         photo: req.body.photo,
         userID: req.loggedUser.id,
         state: "pending",
-      });
+      });   
       return res.status(201).json({
         success: true,
         msg: "Occurrence was registered successfully!",
-      });
+      }); 
     }
   } catch (err) {
     res.status(500).json({
