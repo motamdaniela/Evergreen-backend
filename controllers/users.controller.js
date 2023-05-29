@@ -531,7 +531,7 @@ exports.receiveReward = async (req, res) => {
     let user = await User.findById(req.loggedUser.id);
     if (user.received == false) {
       points.forEach((point) => {
-        if (points.indexOf(point) == user.streak) {
+        if (points.indexOf(point) == user.streak - 1) {
           user.point += point.points;
           user.rewards.push(point.badge);
         }
