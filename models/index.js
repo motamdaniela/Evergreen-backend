@@ -8,6 +8,7 @@ db.mongoose = mongoose;
     await db.mongoose.connect(dbConfig.URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      dbName: dbConfig.DB,
     });
   } catch (error) {
     console.log("cannot connect to database", error);
