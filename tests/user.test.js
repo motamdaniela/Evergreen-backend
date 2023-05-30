@@ -1,67 +1,32 @@
+require("dotenv").config();
 const mongoose = require("mongoose");
-const User = require("../models/users.model"); // Replace 'User' with the actual model name
+const request = require("supertest");
+const dbConfig = require("../config/db.config.js");
+const app = require("../index");
 
-describe("Mongoose Database Tests", () => {
-  beforeAll(async () => {
-    // Connect to the test database
-    await mongoose
-      .connect(
-        "mongodb+srv://beatriz:123@atlascluster.wdlmhli.mongodb.net/?retryWrites=true&w=majority",
-        {
-          useNewUrlParser: true,
-          useUnifiedTopology: true,
-        }
-      )
-      .then(() => console.log("Database Connected Successfully"))
+const User = require("../models/users.model");
 
-      .catch((err) => console.log(err));
-  });
+beforeEach(async () => {
+  await mongoose.connect(dbConfig.URL);
+});
 
-  afterAll(async () => {
-    // Disconnect from the database~
-    await User.deleteMany({});
-    await mongoose.connection.close();
-  });
+afterEach(async () => {
+  await mongoose.connection.close();
+});
 
-  beforeEach(async () => {
-    // Clear the test database before each test
-    await User.deleteMany({});
-  });
+afterAll(async () => {
+  await mongoose.connection.close();
+});
 
-  test("should create a new document", async () => {
-    const data = {
-      name: "John",
-      username: "user123",
-      school: "ESMAD",
-      email: "example@gmail.com",
+describe("POST /users/signup", () => {
+  it("should create a user", async () => {
+    const res = await request(app).post("/users/signup").send({
+      email: "123@aaa",
+      username: "aaaa",
+      name: "Product 2",
       password: "123",
-    };
-    const createdDocument = await User.create(data);
-    console.log(createdDocument);
-    expect(createdDocument).toBeDefined();
-    expect(createdDocument).toMatchObject(data);
+      school: "ESMAD",
+    });
+    expect(res.statusCode).toBe(201);
   });
-
-  test("should retrieve documents", async () => {
-    // Insert test documents
-    const testData = [
-      {
-        name: "John",
-        username: "user123",
-        school: "ESMAD",
-        email: "example@gmail.com",
-        password: "123",
-        confPassword: "123",
-      },
-      // Add more test documents as needed
-    ];
-    await User.insertMany(testData);
-
-    // Retrieve documents
-    const documents = await User.find();
-
-    expect(documents.length).toBe(testData.length);
-  });
-
-  // Add more test cases as needed
 });

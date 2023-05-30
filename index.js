@@ -23,6 +23,7 @@ app.listen(port, host, () =>
   console.log(`App listening at http://${host}:${port}/`)
 );
 
+module.exports = app;
 // ? para dizer o que ta feito
 // ! para dizer que ta mal /  incompleto
 // * explicar coisas
