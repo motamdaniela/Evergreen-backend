@@ -7,8 +7,10 @@ exports.verifyToken = (req, res, next) => {
   if (typeof header == "undefined")
     return res.status(401).json({ success: false, msg: "No token provided!" });
 
-  const bearer = header.split(" "); // Authorization: Bearer <token>
-  const token = bearer[1];
+  // const bearer = header.split(" "); // Authorization: Bearer <token>
+  // const token = bearer[1];
+  let token = header;
+  console.log(header, token)
 
   try {
     let decoded = jwt.verify(token, config.SECRET);

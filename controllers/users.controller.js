@@ -252,6 +252,8 @@ exports.login = async (req, res) => {
     return res.status(200).json({
       success: true,
       accessToken: token,
+      type: user.type,
+      email: user.email,
     });
   } catch (err) {
     if (err instanceof ValidationError)
