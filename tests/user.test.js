@@ -1,3 +1,4 @@
+// começo de cenas que sao iguais para todos os testes
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 const request = require("supertest");
@@ -23,10 +24,17 @@ afterAll(async () => {
   await mongoServer.stop();
   server.close();
 });
+// final de cenas que sao iguais para todos os testes
 
+// tens de fazer sempre signup e login para ter a autorização
+// isto descreve basicamente a rota é tipo console.log
 describe("POST /users/signup", () => {
   it("should create a user", async () => {
+    // o it é o que é suposto fazer
+    // tem de ter it para cada resposta possível
+    //vai à app buscar o router acho e tens de por o método e a rota
     const res = await request(app).post("/users/signup").send({
+      // o send envia as cenas que deveriam estar no body
       email: "user@example.com",
       username: "user",
       name: "user",
@@ -34,6 +42,7 @@ describe("POST /users/signup", () => {
       confPassword: "123",
       school: "ESMAD",
     });
+    // recebes o status code que deu + o esperado
     expect(res.statusCode).toBe(201);
   });
   it("should create a admin", async () => {
@@ -56,8 +65,10 @@ describe("POST /users/login", () => {
       username: "user",
       password: "123",
     });
+    // ele obteve de resposta o token então aqui guarda
     token = res.body.accessToken;
     let decoded = jwt.verify(token, config.SECRET);
+    // user logado
     user = { id: decoded.id, type: decoded.type };
     expect(res.statusCode).toBe(200);
   });
@@ -76,7 +87,7 @@ describe("GET /users", () => {
   it("should get all users type user", async () => {
     const res = await request(app)
       .get("/users")
-      .set("Authorization", `Bearer ${token}`);
+      .set("Authorization", `Bearer ${token}`); // auth token
     expect(res.statusCode).toBe(200);
   });
   it("should get all users", async () => {
@@ -139,7 +150,7 @@ describe("PATCH /users/dailyReward", () => {
 describe("PATCH /users/adminEdit/:userID", () => {
   it("admin should edit password", async () => {
     const res = await request(app)
-      .patch(`/users/adminEdit/${user.id}`)
+      .patch(`/users/adminEdit/${user.id}`) // parâmetro userID
       .set("Authorization", `Bearer ${tokenAdmin}`)
       .send({
         password: "1234",

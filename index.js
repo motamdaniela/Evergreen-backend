@@ -25,5 +25,5 @@ const server = app.listen(port, host, () =>
 
 module.exports = { app, server };
 // ? para dizer o que ta feito
-// ! para dizer que ta mal /  incompleto
+// ! para dizer que ta mal / incompleto
 // * explicar coisas

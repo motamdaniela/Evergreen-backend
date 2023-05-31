@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const config = require("../config/db.config.js");
 const db = require("../models");
 const User = db.users;
+const Mission = db.missions;
 
 // ? sign up
 exports.createUser = async (req, res) => {
@@ -51,10 +52,8 @@ exports.createUser = async (req, res) => {
         .status(409)
         .json({ success: false, msg: `Username already in use!` });
     }
-
-    let today = new Date();
     // Save user to DB
-    await User.create({
+    let u = await User.create({
       type: req.body.type,
       email: req.body.email,
       username: req.body.username,
@@ -72,6 +71,16 @@ exports.createUser = async (req, res) => {
       rewards: [],
       council: false,
     });
+
+    let missions = await Mission.find();
+    missions.forEach((mission) => {
+      mission.users.push({
+        user: u.id,
+        status: 0,
+      });
+      Mission.updateOne({ _id: mission._id }, mission).exec();
+    });
+    // await Mission.save();
     return res.status(201).json({
       success: true,
       msg: "User was registered successfully!",
