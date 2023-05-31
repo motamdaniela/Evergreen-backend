@@ -63,17 +63,7 @@ exports.createUser = async (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10),
       school: req.body.school,
       previousLoginDate: 0,
-      loginDate: +(
-        today.getFullYear() +
-        "" +
-        ((today.getMonth() + 1).toString().length != 2
-          ? "0" + (today.getMonth() + 1)
-          : today.getMonth() + 1) +
-        "" +
-        (today.getDate().toString().length != 2
-          ? "0" + today.getDate()
-          : today.getDate())
-      ),
+      loginDate: 0,
       streak: 0,
       received: false,
       points: 0,
@@ -380,6 +370,12 @@ exports.editUser = async (req, res) => {
         }
         if (req.body.password == req.body.confPassword) {
           user.password = bcrypt.hashSync(req.body.password, 10);
+          await user.save();
+          return res.status(200).json({
+            success: true,
+            msg: `success`,
+            user: user,
+          });
         } else {
           return res.status(403).json({
             success: false,

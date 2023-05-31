@@ -1,7 +1,7 @@
 const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 const request = require("supertest");
-const app = require("../index");
+const { app, server } = require("../index");
 const jwt = require("jsonwebtoken");
 const config = require("../config/db.config.js");
 
@@ -21,6 +21,7 @@ beforeAll(async () => {
 afterAll(async () => {
   await mongoose.disconnect();
   await mongoServer.stop();
+  server.close();
 });
 
 describe("POST /users/signup", () => {
@@ -126,6 +127,43 @@ describe("POST /users/createAdmin", () => {
   });
 });
 
+describe("PATCH /users/dailyReward", () => {
+  it("user should receive reward", async () => {
+    const res = await request(app)
+      .patch(`/users/dailyReward`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+describe("PATCH /users/adminEdit/:userID", () => {
+  it("admin should edit password", async () => {
+    const res = await request(app)
+      .patch(`/users/adminEdit/${user.id}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`)
+      .send({
+        password: "1234",
+        confPassword: "1234",
+      });
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+describe("PATCH /users/edit/:userID", () => {
+  it("should edit user profile", async () => {
+    const res = await request(app)
+      .patch(`/users/edit/${user.id}`)
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        name: "nome",
+        photo: "link",
+        password: "1234",
+        confPassword: "1234",
+      });
+    expect(res.statusCode).toBe(200);
+  });
+});
+
 describe("BLOCK /users/:userID", () => {
   it("should block user", async () => {
     const res = await request(app)
@@ -153,14 +191,5 @@ describe("DELETE /users/:userID", () => {
       .delete(`/users/${user.id}`)
       .set("Authorization", `Bearer ${tokenAdmin}`);
     expect(res.statusCode).toBe(204);
-  });
-});
-
-describe("PATCH /users/dailyReward", () => {
-  it("user give already received error", async () => {
-    const res = await request(app)
-      .delete(`/users/dailyReward`)
-      .set("Authorization", `Bearer ${token}`);
-    expect(res.statusCode).toBe(403);
   });
 });

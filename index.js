@@ -19,11 +19,11 @@ app.use("/occurrences", require("./routes/occurrences.routes.js"));
 app.all("*", function (req, res) {
   res.status(404).json({ message: "WHAT???" });
 });
-app.listen(port, host, () =>
+const server = app.listen(port, host, () =>
   console.log(`App listening at http://${host}:${port}/`)
 );
 
-module.exports = app;
+module.exports = { app, server };
 // ? para dizer o que ta feito
 // ! para dizer que ta mal /  incompleto
 // * explicar coisas
