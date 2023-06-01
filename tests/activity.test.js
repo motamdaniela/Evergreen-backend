@@ -102,7 +102,16 @@ describe('GET /activities/:activityID', () => {
       .get(`/activities/${activity.id}`)
     expect(res.statusCode).toBe(200)
   })
-})
+});
+
+describe('PATCH /activities/:activityID', () => {
+  it('should subscribe to activity', async () => {
+    const res = await request(app)
+      .patch(`/activities/${activity.id}`)
+      .set('Authorization', `Bearer ${token}`)
+    expect(res.statusCode).toBe(200)
+  })
+});
 
 describe('GET /activities/coordinator', () => {
   it('should get all activities from coordinator', async () => {
@@ -113,7 +122,16 @@ describe('GET /activities/coordinator', () => {
   });
 });
 
-describe("POST /activities/suggestion", () => {
+describe('PATCH /activities/participation/:activityID/users/:userID', () => {
+  it('should verify users presence', async () => {
+    const res = await request(app)
+      .patch(`/activities/participation/${activity.id}/users/${user.id}`)
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+    expect(res.statusCode).toBe(200)
+  })
+});
+
+describe('POST /activities/suggestion', () => {
   it("should create a suggestion", async () => {
     const res = await request(app)
       .post("/activities/suggestion")

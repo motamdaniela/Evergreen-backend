@@ -2,14 +2,9 @@ const { MongoMemoryServer } = require("mongodb-memory-server");
 const mongoose = require("mongoose");
 const request = require("supertest");
 const { app, server } = require("../index");
-const jwt = require("jsonwebtoken");
-const config = require("../config/db.config.js");
+const { missions } = require("../models");
 
 let mongoServer;
-
-let token = "";
-let tokenAdmin = "";
-let user = "";
 
 beforeAll(async () => {
   await mongoose.disconnect();
@@ -24,6 +19,8 @@ afterAll(async () => {
   await mongoServer.stop();
   server.close();
 });
+
+let token, tokenAdmin, mission
 
 describe("POST /users/signup", () => {
     it("should create a user", async () => {
@@ -78,7 +75,7 @@ describe('GET /missions', () => {
             .set('Authorization', `Bearer ${token}`)
         expect(res.statusCode).toBe(200)
     })
-})
+});
 
 describe('PATCH /missions', () => {
     it('should receive mission badge', async () => {
@@ -86,6 +83,22 @@ describe('PATCH /missions', () => {
             .patch('/missions')
             .set('Authorization', `Bearer ${token}`)
         expect(res.statusCode).toBe(200)
+    })
+});
+
+describe('GET /missions/:missionID', () => {
+    it('should get one mission', async () => {
+        mission = await missions.create({
+            'title': 'inscrever na primeira atividade',
+            'description': 'escolhe uma atividade que gostavas de participar', 
+            'reward': 'src/assets/images/inscrever_1.png',
+            'users': [],
+            'max': 1,
+            'type': 0
+        })
+        const res = await request(app)
+            .get(`/missions/${mission.id}`)
+        expect(res.statusCode).toBe(200)  
     })
 })
 
