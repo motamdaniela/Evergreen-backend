@@ -69,7 +69,7 @@ describe("POST /users/signup", () => {
         expect(res.statusCode).toBe(201);
       });
   });
-  
+//login dos utilizadores criados
   describe("POST /users/login", () => {
     it("should login as user", async () => {
       const res = await request(app).post("/users/login").send({
@@ -101,6 +101,9 @@ describe("POST /users/signup", () => {
   });
 
 //start of the occurrence tests
+
+//rota /occurences
+//get
 describe("GET /occurrences", () => {
     //get occurrences as admin
     it("should get all occurrences", async () => {
@@ -130,25 +133,39 @@ describe("GET /occurrences", () => {
           expect(res.statusCode).not.toBe(403);
         });
 
-    //get occurrences as user (should not get access)
-    it("should get all occurrences as user", async () => {
+    //get occurrences as user
+    it("should get user's occurrences", async () => {
         const res = await request(app)
           .get("/occurrences")
           .set("Authorization", `Bearer ${token}`);
-        expect(res.statusCode).toBe(403);
+        expect(res.statusCode).toBe(200);
       });
       it("invalid get all occurrences as user", async () => {
           const res = await request(app)
             .get("/occurrences")
             .set("Authorization", `Bearer ${token}`);
+          expect(res.statusCode).not.toBe(403);
+        });
+
+    //get occurrences while not logged in(shouldnt get access)
+    it("should not get occurrences", async () => {
+        const res = await request(app)
+          .get("/occurrences")
+          .set("Authorization", `Bearer #`);
+        expect(res.statusCode).toBe(403);
+      });
+      it("invalid should not get occurrences", async () => {
+          const res = await request(app)
+            .get("/occurrences")
+            .set("Authorization", `Bearer #`);
           expect(res.statusCode).not.toBe(200);
         });
 
   });
 
-
+//post
   describe("POST /occurrences", () => {
-    //get occurrences as user
+    //post occurrence as user
     it("should post new occurrence", async () => {
         const res = await request(app)
           .post("/occurrences")
@@ -161,8 +178,9 @@ describe("GET /occurrences", () => {
             description: 'luz ligada numa sala vazia',
             photo: '#',
           });
-        let decoded = jwt.verify(token, config.SECRET);
-        ocID = decoded.id;
+
+        //! acho q o problema esta aqui but idk 
+        ocID = res.occurrence.id;
         expect(res.statusCode).toBe(201);
       });
       it("invalid post new occurrence", async () => {
@@ -180,7 +198,7 @@ describe("GET /occurrences", () => {
         expect(res.statusCode).not.toBe(400);
       });
 
-      //get occurrences as admin(shouldnt be allowed)
+      //post occurrence as admin(shouldnt be allowed)
     it("should not authorize to post new occurrence", async () => {
         const res = await request(app)
           .post("/occurrences")
@@ -210,5 +228,239 @@ describe("GET /occurrences", () => {
         expect(res.statusCode).not.toBe(201);
       });
 
+      //post ocurrence with a null field item
+      it("should ask to provide field", async () => {
+        const res = await request(app)
+          .post("/occurrences")
+          .set("Authorization", `Bearer ${token}`)
+          .send({
+            school: '',
+            building: 'A',
+            classroom: '201',
+            type: 'Luz ligada',
+            description: 'luz ligada numa sala vazia',
+            photo: '#',
+          });
+        expect(res.statusCode).toBe(400);
+      });
+      it("invalid should ask to provide field", async () => {
+        const res = await request(app)
+          .post("/occurrences")
+          .set("Authorization", `Bearer ${token}`)
+          .send({
+            school: '',
+            building: 'A',
+            classroom: '201',
+            type: 'Luz ligada',
+            description: 'luz ligada numa sala vazia',
+            photo: '#',
+          });
+        expect(res.statusCode).not.toBe(201);
+      });
+
+      //post ocurrence with invalid school(does not exist)
+      it("should say school does not exist", async () => {
+        const res = await request(app)
+          .post("/occurrences")
+          .set("Authorization", `Bearer ${token}`)
+          .send({
+            school: 'madeupschool',
+            building: 'A',
+            classroom: '201',
+            type: 'Luz ligada',
+            description: 'luz ligada numa sala vazia',
+            photo: '#',
+          });
+        expect(res.statusCode).toBe(400);
+      });
+      it("invalid should say school does not exist", async () => {
+        const res = await request(app)
+          .post("/occurrences")
+          .set("Authorization", `Bearer ${token}`)
+          .send({
+            school: 'madeupschool',
+            building: 'A',
+            classroom: '201',
+            type: 'Luz ligada',
+            description: 'luz ligada numa sala vazia',
+            photo: '#',
+          });
+        expect(res.statusCode).not.toBe(201);
+      });
+
+      //post ocurrence with invalid building(does not exist)
+      it("should say building does not exist", async () => {
+        const res = await request(app)
+          .post("/occurrences")
+          .set("Authorization", `Bearer ${token}`)
+          .send({
+            school: 'ESMAD',
+            building: 'E',
+            classroom: '201',
+            type: 'Luz ligada',
+            description: 'luz ligada numa sala vazia',
+            photo: '#',
+          });
+        expect(res.statusCode).toBe(400);
+      });
+      it("invalid should say building does not exist", async () => {
+        const res = await request(app)
+          .post("/occurrences")
+          .set("Authorization", `Bearer ${token}`)
+          .send({
+            school: 'ESMAD',
+            building: 'E',
+            classroom: '201',
+            type: 'Luz ligada',
+            description: 'luz ligada numa sala vazia',
+            photo: '#',
+          });
+        expect(res.statusCode).not.toBe(201);
+      });
+  });
+
+
+  //rota /occurences/:ocID
+//get
+describe("GET /occurrences/:ocID", () => {
+    //get occurrence as admin
+    it("should get specific occurrence", async () => {
+      const res = await request(app)
+        .get(`/occurrences/${ocID}`)
+        .set("Authorization", `Bearer ${tokenAdmin}`);
+      expect(res.statusCode).toBe(200);
+    });
+    it("invalid get specific occurrence", async () => {
+        const res = await request(app)
+          .get(`/occurrences/${ocID}`)
+          .set("Authorization", `Bearer ${tokenAdmin}`);
+        expect(res.statusCode).not.toBe(403);
+      });
+
+    //get occurrence as Security
+    it("should get specific occurrence as security", async () => {
+        const res = await request(app)
+          .get(`/occurrences/${ocID}`)
+          .set("Authorization", `Bearer ${tokenSecurity}`);
+        expect(res.statusCode).toBe(200);
+      });
+      it("invalid get specific occurrence as security", async () => {
+          const res = await request(app)
+            .get(`/occurrences/${ocID}`)
+            .set("Authorization", `Bearer ${tokenSecurity}`);
+          expect(res.statusCode).not.toBe(403);
+        });
+
+    //get occurrence as user(should not be allowed)
+    it("should not get specific occurrence", async () => {
+        const res = await request(app)
+          .get(`/occurrences/${ocID}`)
+          .set("Authorization", `Bearer ${token}`);
+        expect(res.statusCode).toBe(403);
+      });
+      it("invalid not get specific occurrence", async () => {
+          const res = await request(app)
+            .get(`/occurrences/${ocID}`)
+            .set("Authorization", `Bearer ${token}`);
+          expect(res.statusCode).not.toBe(200);
+        });
+
+    //invalid occurrence id
+    it("should not find occurrence", async () => {
+        const res = await request(app)
+          .get(`/occurrences/1`)
+          .set("Authorization", `Bearer ${tokenAdmin}`);
+        expect(res.statusCode).toBe(404);
+      });
+      it("invalid not find occurrence", async () => {
+          const res = await request(app)
+            .get(`/occurrences/1`)
+            .set("Authorization", `Bearer ${tokenAdmin}`);
+          expect(res.statusCode).not.toBe(200);
+        });
+
+  });
+
+//put
+describe("PUT /occurrences/:ocID", () => {
+    //change occurrence's state as an admin
+    it("should change occurrence's state", async () => {
+      const res = await request(app)
+        .put(`/occurrences/${ocID}`)
+        .set("Authorization", `Bearer ${tokenAdmin}`)
+        .send({
+            state: 'solved',
+          });
+      expect(res.statusCode).toBe(200);
+    });
+    it("invalid change occurrence's state", async () => {
+        const res = await request(app)
+          .put(`/occurrences/${ocID}`)
+          .set("Authorization", `Bearer ${tokenAdmin}`)
+          .send({
+              state: 'solved',
+            });
+        expect(res.statusCode).not.toBe(403);
+      });
+
+      //change occurrence's state as an Security
+    it("should change occurrence's state as security", async () => {
+        const res = await request(app)
+          .put(`/occurrences/${ocID}`)
+          .set("Authorization", `Bearer ${tokenSecurity}`)
+          .send({
+              state: 'solved',
+            });
+        expect(res.statusCode).toBe(200);
+      });
+      it("invalid change occurrence's state as security", async () => {
+          const res = await request(app)
+            .put(`/occurrences/${ocID}`)
+            .set("Authorization", `Bearer ${tokenSecurity}`)
+            .send({
+                state: 'solved',
+              });
+          expect(res.statusCode).not.toBe(403);
+        });
+
+      //change occurrence's state as user(should not get access)
+    it("should say requires admin or security user", async () => {
+        const res = await request(app)
+          .put(`/occurrences/${ocID}`)
+          .set("Authorization", `Bearer ${tokenAdmin}`)
+          .send({
+              state: 'solved',
+            });
+        expect(res.statusCode).toBe(403);
+      });
+      it("invalid say requires admin or security user", async () => {
+          const res = await request(app)
+            .put(`/occurrences/${ocID}`)
+            .set("Authorization", `Bearer ${tokenAdmin}`)
+            .send({
+                state: 'solved',
+              });
+          expect(res.statusCode).not.toBe(200);
+        });
+    
+    //invalid occurrence id
+    it("should not be able to find occurrence", async () => {
+        const res = await request(app)
+          .put(`/occurrences/1`)
+          .set("Authorization", `Bearer ${tokenAdmin}`)
+          .send({
+              state: 'solved',
+            });
+        expect(res.statusCode).toBe(404);
+      });
+      it("invalid not be able to find occurrence", async () => {
+          const res = await request(app)
+            .put(`/occurrences/1`)
+            .set("Authorization", `Bearer ${tokenAdmin}`)
+            .send({
+                state: 'solved',
+              });
+          expect(res.statusCode).not.toBe(200);
+        });
 
   });
