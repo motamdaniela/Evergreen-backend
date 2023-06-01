@@ -40,7 +40,7 @@ exports.findOne = async (req, res) => {
     return res.json({ success: true, mission: mission });
   } catch (err) {
     if (err.name === "CastError") {
-      return res.status(404).json({
+      return res.status(400).json({
         success: false,
         msg: "Id parameter is not a valid ObjectID",
       });

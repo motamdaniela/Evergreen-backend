@@ -22,6 +22,7 @@ afterAll(async () => {
 
 let token, tokenAdmin, mission
 
+// * signup
 describe("POST /users/signup", () => {
     it("should create a user", async () => {
       const res = await request(app).post("/users/signup").send({
@@ -48,7 +49,8 @@ describe("POST /users/signup", () => {
     });
   });
   
-  describe("POST /users/login", () => {
+// *login
+describe("POST /users/login", () => {
     it("should login as user", async () => {
       const res = await request(app).post("/users/login").send({
         username: "user",
@@ -68,24 +70,41 @@ describe("POST /users/signup", () => {
     });
   });
 
+// * get all missions 
 describe('GET /missions', () => {
     it('should get all missions', async () => {
         const res = await request(app)
             .get('/missions')
             .set('Authorization', `Bearer ${token}`)
         expect(res.statusCode).toBe(200)
+    });
+
+    it('should say user role is required', async () => {
+        const res = await request(app)
+            .get('/missions')
+            .set('Authorization', `Bearer ${tokenAdmin}`)
+        expect(res.statusCode).toBe(403)
     })
 });
 
+// * receive badge
 describe('PATCH /missions', () => {
     it('should receive mission badge', async () => {
         const res = await request(app)
             .patch('/missions')
             .set('Authorization', `Bearer ${token}`)
         expect(res.statusCode).toBe(200)
-    })
+    });
+
+    it('should say user role is required', async () => {
+        const res = await request(app)
+            .patch('/missions')
+            .set('Authorization', `Bearer ${tokenAdmin}`)
+        expect(res.statusCode).toBe(403)
+    });
 });
 
+// * get one mission
 describe('GET /missions/:missionID', () => {
     it('should get one mission', async () => {
         mission = await missions.create({
@@ -99,6 +118,18 @@ describe('GET /missions/:missionID', () => {
         const res = await request(app)
             .get(`/missions/${mission.id}`)
         expect(res.statusCode).toBe(200)  
+    });
+
+    it('should say mission doesnt exist', async () => {
+        const res = await request(app)
+            .get('/missions/6475de6221aff7ae2937c703')
+        expect(res.statusCode).toBe(404) 
+    });
+
+    it('should say id is not valid', async () => {
+        const res = await request(app)
+            .get('/missions/...')
+        expect(res.statusCode).toBe(400) 
     })
 })
 
