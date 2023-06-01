@@ -92,6 +92,7 @@ exports.createUser = async (req, res) => {
       msg: err.message || "Some error occurred while signing up.",
     });
   }
+  console.log(res.status);
 };
 
 // ? create admin
