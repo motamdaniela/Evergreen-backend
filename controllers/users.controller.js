@@ -35,7 +35,7 @@ exports.createUser = async (req, res) => {
         msg: `Your password can't contain spaces!`,
       });
     }
-    if (!req.body.password == req.body.confPassword) {
+    if (!(req.body.password == req.body.confPassword)) {
       return res.status(403).json({
         success: false,
         msg: `The passwords that you provided don't match!`,
@@ -55,6 +55,7 @@ exports.createUser = async (req, res) => {
     let today = new Date();
     // Save user to DB
     await User.create({
+      type: req.body.type,
       email: req.body.email,
       username: req.body.username,
       name: req.body.name,
@@ -137,7 +138,7 @@ exports.createAdmin = async (req, res) => {
           msg: `Your password can't contain spaces!`,
         });
       }
-      if (!req.body.password == req.body.confPassword) {
+      if (!(req.body.password == req.body.confPassword)) {
         return res.status(403).json({
           success: false,
           msg: `The passwords that you provided don't match!`,
@@ -305,13 +306,16 @@ exports.deleteUser = async (req, res) => {
         msg: "This request requires ADMIN role!",
       });
     } else {
-      const user = await User.findByIdAndDelete(req.params.userID);
+      let user = await User.findByIdAndDelete(req.params.userID);
+      console.log(user);
+      console.log(!user);
       if (!user) {
         return res.status(404).json({
           success: false,
           message: "User does not exist",
         });
       } else {
+        console.log("ok");
         return res.status(204).json({
           success: true,
           message: `User with id ${req.params.userID} was deleted successfully`,
@@ -409,6 +413,8 @@ exports.editProfile = async (req, res) => {
       });
     }
     let user = await User.findById(req.params.userID);
+    console.log(user._id);
+    console.log(req.loggedUser.id);
     if (user._id == req.loggedUser.id) {
       if (req.body.username && req.body.username.replace(/\s/g, "").length) {
         if ((await User.find({ username: req.body.username })).length > 0) {
@@ -421,6 +427,16 @@ exports.editProfile = async (req, res) => {
       }
       if (req.body.photo && req.body.photo.replace(/\s/g, "").length) {
         user.photo = req.body.photo;
+      }
+      if (req.body.username && req.body.username.replace(/\s/g, "").length) {
+        if (/\s/g.test(req.body.username)) {
+          return res.status(400).json({
+            success: false,
+            msg: `Your username can't contain spaces!`,
+          });
+        } else {
+          user.username = req.body.username;
+        }
       }
       if (req.body.password && req.body.password.replace(/\s/g, "").length) {
         if (/\s/g.test(req.body.password)) {
