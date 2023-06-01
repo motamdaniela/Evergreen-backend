@@ -24,8 +24,9 @@ afterAll(async () => {
   server.close();
 });
 
-let token, tokenAdmin, user, activity
+let token, tokenAdmin, tokenSecurity, user, activity
 
+// * signup
 describe("POST /users/signup", () => {
   it("should create a user", async () => {
     const res = await request(app).post("/users/signup").send({
@@ -50,8 +51,21 @@ describe("POST /users/signup", () => {
     });
     expect(res.statusCode).toBe(201);
   });
+  it("should create a security", async () => {
+    const res = await request(app).post("/users/signup").send({
+      type: "security",
+      email: "sec@example.com",
+      username: "sec",
+      name: "sec",
+      password: "123",
+      confPassword: "123",
+      school: "ESMAD",
+    });
+    expect(res.statusCode).toBe(201);
+  });
 });
 
+// * login
 describe("POST /users/login", () => {
   it("should login as user", async () => {
     const res = await request(app).post("/users/login").send({
@@ -72,8 +86,18 @@ describe("POST /users/login", () => {
     tokenAdmin = res.body.accessToken;
     expect(res.statusCode).toBe(200);
   });
+
+  it("should login as security", async () => {
+    const res = await request(app).post("/users/login").send({
+      username: "sec",
+      password: "123",
+    });
+    tokenSecurity = res.body.accessToken;
+    expect(res.statusCode).toBe(200);
+  });
 });
 
+// * get all activities
 describe("GET /activities", () => {
   it("should get all activities", async () => {
     const res = await request(app)
@@ -82,8 +106,16 @@ describe("GET /activities", () => {
       
     expect(res.statusCode).toBe(200);
   });
+
+  it('should say you dont have access', async () => {
+    const res = await request(app)
+      .get('/activities')
+      .set('Authorization', `Bearer ${tokenAdmin}`)
+    expect(res.statusCode).toBe(403)
+  });
 });
 
+// * get one activity
 describe('GET /activities/:activityID', () => {
   it('should get one activity', async () => {
     activity = await activities.create({
@@ -101,18 +133,46 @@ describe('GET /activities/:activityID', () => {
     const res = await request(app)
       .get(`/activities/${activity.id}`)
     expect(res.statusCode).toBe(200)
+  });
+
+  it('should say activity doesnt exist', async () => {
+    const res = await request(app)
+      .get('/activities/6475de6221aff7ae2937c703')
+    expect(res.statusCode).toBe(404)
+  });
+
+  it('should say id is not valid', async () => {
+    const res = await request(app)
+      .get('/activities/...')
+    expect(res.statusCode).toBe(400)
   })
 });
 
+// * subscribe to an activity
 describe('PATCH /activities/:activityID', () => {
   it('should subscribe to activity', async () => {
     const res = await request(app)
       .patch(`/activities/${activity.id}`)
       .set('Authorization', `Bearer ${token}`)
     expect(res.statusCode).toBe(200)
+  });
+
+  it('should say user role is required', async () => {
+    const res = await request(app)
+    .patch(`/activities/${activity.id}`)
+    .set('Authorization', `Bearer ${tokenAdmin}`)
+  expect(res.statusCode).toBe(403)
+  });
+
+  it('should say id is not valid', async () => {
+    const res = await request(app)
+    .patch('/activities/...')
+    .set('Authorization', `Bearer ${token}`)
+  expect(res.statusCode).toBe(400)
   })
 });
 
+// * get all activities from coordinator
 describe('GET /activities/coordinator', () => {
   it('should get all activities from coordinator', async () => {
     const res = await request(app)
@@ -120,17 +180,47 @@ describe('GET /activities/coordinator', () => {
       .set('Authorization', `Bearer ${token} || ${tokenAdmin}`)
     expect(res.statusCode).toBe(200)
   });
+
+  it('should say user or admin role is required', async () => {
+    const res = await request(app)
+      .get('/activities/coordinator')
+      .set('Authorization', `Bearer ${tokenSecurity}`)
+    expect(res.statusCode).toBe(403)
+  });
+
+  it('should say you are not the coordinator of any activity', async () => {
+    const res = await request(app)
+      .get('/activities/coordinator')
+      .set('Authorization', `Bearer ${tokenSecurity}`)
+    expect(res.statusCode).toBe(403)
+  })
 });
 
+// * verify participation
 describe('PATCH /activities/participation/:activityID/users/:userID', () => {
   it('should verify users presence', async () => {
     const res = await request(app)
       .patch(`/activities/participation/${activity.id}/users/${user.id}`)
       .set('Authorization', `Bearer ${tokenAdmin}`)
     expect(res.statusCode).toBe(200)
-  })
+  });
+
+  it('should say admin role is required', async () => {
+    const res = await request(app)
+      .patch(`/activities/participation/${activity.id}/users/${user.id}`)
+      .set('Authorization', `Bearer ${token}`)
+      expect(res.statusCode).toBe(403)
+  });
+
+  it('should say id is not valid', async () => {
+    const res = await request(app)
+      .patch(`/activities/participation/.../users/${user.id}`)
+      .set('Authorization', `Bearer ${tokenAdmin}`) 
+    expect(res.statusCode).toBe(400)
+  });
 });
 
+// ! activity suggestion
 describe('POST /activities/suggestion', () => {
   it("should create a suggestion", async () => {
     const res = await request(app)
@@ -140,10 +230,40 @@ describe('POST /activities/suggestion', () => {
         theme: 'Água',
         description: 'uma descrição',
         objectives: 'alguns objetivos',
-        goals: 'whats the difference to this ^',
-        resources: 'some resources',
+        goals: 'metas',
+        resources: 'recursos necessarios',
         userID: `${user.id}`,
       });
     expect(res.statusCode).toBe(201);
   });
+
+  it("should say user role is required", async () => {
+    const res = await request(app)
+      .post("/activities/suggestion")
+      .set("Authorization", `Bearer ${tokenAdmin}`)
+      .send({
+        theme: 'Água',
+        description: 'uma descrição',
+        objectives: 'alguns objetivos',
+        goals: 'metas',
+        resources: 'recursos necessarios',
+        userID: `${user.id}`,
+      });
+    expect(res.statusCode).toBe(403);
+  });
+
+  it('should say theme is invalid', async () => {
+    const res = await request(app)
+      .post("/activities/suggestion")
+      .set("Authorization", `Bearer ${token}`)
+      .send({
+        theme: 'Tema?',
+        description: 'uma descrição',
+        objectives: 'alguns objetivos',
+        goals: 'metas',
+        resources: 'recursos necessarios',
+        userID: `${user.id}`,
+      });
+    expect(res.statusCode).toBe(400);
+  })
 });
