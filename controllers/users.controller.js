@@ -3,7 +3,6 @@ const bcrypt = require("bcryptjs");
 const config = require("../config/db.config.js");
 const db = require("../models");
 const User = db.users;
-const Mission = db.missions;
 
 // ? sign up
 exports.createUser = async (req, res) => {
@@ -52,9 +51,10 @@ exports.createUser = async (req, res) => {
         .status(409)
         .json({ success: false, msg: `Username already in use!` });
     }
+
+    let today = new Date();
     // Save user to DB
-    let u = await User.create({
-      type: req.body.type,
+    await User.create({
       email: req.body.email,
       username: req.body.username,
       name: req.body.name,
@@ -62,7 +62,17 @@ exports.createUser = async (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10),
       school: req.body.school,
       previousLoginDate: 0,
-      loginDate: 0,
+      loginDate: +(
+        today.getFullYear() +
+        "" +
+        ((today.getMonth() + 1).toString().length != 2
+          ? "0" + (today.getMonth() + 1)
+          : today.getMonth() + 1) +
+        "" +
+        (today.getDate().toString().length != 2
+          ? "0" + today.getDate()
+          : today.getDate())
+      ),
       streak: 0,
       received: false,
       points: 0,
@@ -71,16 +81,6 @@ exports.createUser = async (req, res) => {
       rewards: [],
       council: false,
     });
-
-    let missions = await Mission.find();
-    missions.forEach((mission) => {
-      mission.users.push({
-        user: u.id,
-        status: 0,
-      });
-      Mission.updateOne({ _id: mission._id }, mission).exec();
-    });
-    // await Mission.save();
     return res.status(201).json({
       success: true,
       msg: "User was registered successfully!",
@@ -252,8 +252,7 @@ exports.login = async (req, res) => {
     return res.status(200).json({
       success: true,
       accessToken: token,
-      type: user.type,
-      email: user.email,
+      user: user,
     });
   } catch (err) {
     if (err instanceof ValidationError)
@@ -379,12 +378,6 @@ exports.editUser = async (req, res) => {
         }
         if (req.body.password == req.body.confPassword) {
           user.password = bcrypt.hashSync(req.body.password, 10);
-          await user.save();
-          return res.status(200).json({
-            success: true,
-            msg: `success`,
-            user: user,
-          });
         } else {
           return res.status(403).json({
             success: false,
