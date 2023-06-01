@@ -72,7 +72,10 @@ exports.findOne = async (req, res) => {
         success: false,
         msg: `Cannot find any activity with ID ${req.params.activityID}`,
       });
-    return res.json({ success: true, activity: activity });
+    return res.status(200).json({ 
+      success: true, 
+      activity: activity 
+    });
   } catch (err) {
     if (err.name === "CastError") {
       return res.status(400).json({

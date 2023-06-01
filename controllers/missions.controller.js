@@ -62,7 +62,10 @@ exports.receiveBadge = async (req, res) => {
         user.rewards.push(req.body.badge);
       }
       await user.save();
-      return res.json({ success: true, user: user });
+      return res.status(200).json({
+        success: true,
+        user: user,
+      });
     }
   } catch (err) {
     return res.status(500).json({

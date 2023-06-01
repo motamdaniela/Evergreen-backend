@@ -25,7 +25,7 @@ exports.create = async (req, res) => {
           msg: "Suggestion was registered successfully!",
         });
       } else {
-        res.status(500).json({
+        res.status(400).json({
           success: false,
           msg: err.message || "Invalid theme",
         });
@@ -35,7 +35,7 @@ exports.create = async (req, res) => {
     res.status(500).json({
       success: false,
       msg:
-        err.message || "Some error occurred while retrieving all occurrences.",
+        err.message || "Some error occurred while submiting suggestion",
     });
   }
 };
