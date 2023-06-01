@@ -115,7 +115,14 @@ exports.findOne = async (req, res) => {
       });
     } else {
       let occurrence = await Occurrence.findById(req.params.occID);
-      res.status(200).json({ success: true, occurrence: occurrence });
+      if (occurrence === null){
+        return res.status(404).json({
+          success: false,
+          msg: `Cannot find any occurrence with ID ${req.params.occID}`,
+        });
+      }else{
+        res.status(200).json({ success: true, occurrence: occurrence });
+      }
     }
   } catch (err) {
     res.status(500).json({
@@ -126,6 +133,7 @@ exports.findOne = async (req, res) => {
   }
 };
 
+
 exports.validate = async (req, res) => {
   try {
     if (req.loggedUser.type == "user") {
@@ -135,9 +143,16 @@ exports.validate = async (req, res) => {
       });
     } else {
       let occurrence = await Occurrence.findById(req.params.occID);
-      occurrence.state = req.body.state;
-      await occurrence.save();
-      res.status(200).json({ success: true, occurrence: occurrence });
+      if (occurrence === null){
+        return res.status(404).json({
+          success: false,
+          msg: `Cannot find any occurrence with ID ${req.params.occID}`,
+        });
+      }else{
+        occurrence.state = req.body.state;
+        await occurrence.save();
+        res.status(200).json({ success: true, occurrence: occurrence });
+      }
     }
   } catch (err) {
     res.status(500).json({
