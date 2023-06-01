@@ -55,6 +55,7 @@ exports.createUser = async (req, res) => {
     let today = new Date();
     // Save user to DB
     await User.create({
+      type: req.body.type,
       email: req.body.email,
       username: req.body.username,
       name: req.body.name,

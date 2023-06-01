@@ -218,6 +218,7 @@ describe("GET /users", () => {
     expect(res.statusCode).toBe(200);
   });
   it("should say you don't have access", async () => {
+    console.log(jwt.verify(tokenSecurity, config.SECRET));
     const res = await request(app)
       .get("/users")
       .set("Authorization", `Bearer ${tokenSecurity}`);
