@@ -70,7 +70,7 @@ exports.create = async (req, res) => {
       
       let today = new Date();
       console.log(req.loggedUser.id);
-      await Occurrence.create({
+      let oc = await Occurrence.create({
         date:
           today.getDate() +
           "-" +
@@ -91,10 +91,11 @@ exports.create = async (req, res) => {
         photo: req.body.photo,
         userID: req.loggedUser.id,
         state: "pending",
-      });   
+      });
       return res.status(201).json({
         success: true,
         msg: "Occurrence was registered successfully!",
+        occurrence: oc,
       }); 
     }
   } catch (err) {

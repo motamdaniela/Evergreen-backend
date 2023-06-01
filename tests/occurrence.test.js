@@ -151,13 +151,13 @@ describe("GET /occurrences", () => {
     it("should not get occurrences", async () => {
         const res = await request(app)
           .get("/occurrences")
-          .set("Authorization", ``);
+          .set("Authorization", `Bearer #`);
         expect(res.statusCode).toBe(403);
       });
       it("invalid should not get occurrences", async () => {
           const res = await request(app)
             .get("/occurrences")
-            .set("Authorization", ``);
+            .set("Authorization", `Bearer #`);
           expect(res.statusCode).not.toBe(200);
         });
 
@@ -178,8 +178,9 @@ describe("GET /occurrences", () => {
             description: 'luz ligada numa sala vazia',
             photo: '#',
           });
-        let decoded = jwt.verify(token, config.SECRET);
-        ocID = decoded.id;
+
+        //! acho q o problema esta aqui but idk 
+        ocID = res.occurrence.id;
         expect(res.statusCode).toBe(201);
       });
       it("invalid post new occurrence", async () => {
@@ -263,7 +264,7 @@ describe("GET /occurrences", () => {
           .post("/occurrences")
           .set("Authorization", `Bearer ${token}`)
           .send({
-            school: 'FEUP',
+            school: 'madeupschool',
             building: 'A',
             classroom: '201',
             type: 'Luz ligada',
@@ -277,7 +278,7 @@ describe("GET /occurrences", () => {
           .post("/occurrences")
           .set("Authorization", `Bearer ${token}`)
           .send({
-            school: 'FEUP',
+            school: 'madeupschool',
             building: 'A',
             classroom: '201',
             type: 'Luz ligada',
@@ -320,17 +321,16 @@ describe("GET /occurrences", () => {
 
 
   //rota /occurences/:ocID
-  //!-> falta 404
 //get
 describe("GET /occurrences/:ocID", () => {
     //get occurrence as admin
-    it("should get all occurrences", async () => {
+    it("should get specific occurrence", async () => {
       const res = await request(app)
         .get(`/occurrences/${ocID}`)
         .set("Authorization", `Bearer ${tokenAdmin}`);
       expect(res.statusCode).toBe(200);
     });
-    it("invalid get all occurrences", async () => {
+    it("invalid get specific occurrence", async () => {
         const res = await request(app)
           .get(`/occurrences/${ocID}`)
           .set("Authorization", `Bearer ${tokenAdmin}`);
@@ -338,13 +338,13 @@ describe("GET /occurrences/:ocID", () => {
       });
 
     //get occurrence as Security
-    it("should get all occurrences", async () => {
+    it("should get specific occurrence as security", async () => {
         const res = await request(app)
           .get(`/occurrences/${ocID}`)
           .set("Authorization", `Bearer ${tokenSecurity}`);
         expect(res.statusCode).toBe(200);
       });
-      it("invalid get all occurrences", async () => {
+      it("invalid get specific occurrence as security", async () => {
           const res = await request(app)
             .get(`/occurrences/${ocID}`)
             .set("Authorization", `Bearer ${tokenSecurity}`);
@@ -352,13 +352,13 @@ describe("GET /occurrences/:ocID", () => {
         });
 
     //get occurrence as user(should not be allowed)
-    it("should get all occurrences", async () => {
+    it("should not get specific occurrence", async () => {
         const res = await request(app)
           .get(`/occurrences/${ocID}`)
           .set("Authorization", `Bearer ${token}`);
         expect(res.statusCode).toBe(403);
       });
-      it("invalid get all occurrences", async () => {
+      it("invalid not get specific occurrence", async () => {
           const res = await request(app)
             .get(`/occurrences/${ocID}`)
             .set("Authorization", `Bearer ${token}`);
@@ -404,7 +404,7 @@ describe("PUT /occurrences/:ocID", () => {
       });
 
       //change occurrence's state as an Security
-    it("should change occurrence's state", async () => {
+    it("should change occurrence's state as security", async () => {
         const res = await request(app)
           .put(`/occurrences/${ocID}`)
           .set("Authorization", `Bearer ${tokenSecurity}`)
@@ -413,7 +413,7 @@ describe("PUT /occurrences/:ocID", () => {
             });
         expect(res.statusCode).toBe(200);
       });
-      it("invalid change occurrence's state", async () => {
+      it("invalid change occurrence's state as security", async () => {
           const res = await request(app)
             .put(`/occurrences/${ocID}`)
             .set("Authorization", `Bearer ${tokenSecurity}`)
