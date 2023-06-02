@@ -47,5 +47,5 @@ router
   .post(authController.verifyToken, usersController.createAdmin);
 
 
-router.route("/getLogged").post(usersController.findLogged);
+router.route("/getLogged").get(usersController.findLogged);
 module.exports = router;
