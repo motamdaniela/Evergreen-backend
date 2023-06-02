@@ -167,7 +167,8 @@ describe("GET /occurrences", () => {
         });
 
         //! acho q o problema esta aqui but idk 
-        ocID = res.body._id
+        ocID = res.body.occurrence._id
+        console.log(res.body)
         
         expect(res.statusCode).toBe(201);
       });
@@ -217,6 +218,7 @@ describe("GET /occurrences", () => {
             description: 'luz ligada numa sala vazia',
             photo: '#',
           });
+          
         expect(res.statusCode).toBe(400);
       });
 
@@ -268,7 +270,7 @@ describe("GET /occurrences/:ocID", () => {
     //invalid occurrence id
     it("should not find occurrence", async () => {
         const res = await request(app)
-          .get(`/occurrences/1`)
+          .get(`/occurrences/6479cd59008f5279e2157787`)
           .set("Authorization", `Bearer ${tokenAdmin}`);
         expect(res.statusCode).toBe(404);
       });
@@ -303,7 +305,7 @@ describe("PUT /occurrences/:ocID", () => {
     it("should say requires admin or security user", async () => {
         const res = await request(app)
           .put(`/occurrences/${ocID}`)
-          .set("Authorization", `Bearer ${tokenAdmin}`)
+          .set("Authorization", `Bearer ${token}`)
           .send({
               state: 'solved',
             });
@@ -313,7 +315,7 @@ describe("PUT /occurrences/:ocID", () => {
     //invalid occurrence id
     it("should not be able to find occurrence", async () => {
         const res = await request(app)
-          .put(`/occurrences/1`)
+          .put(`/occurrences/6479cd59008f5279e2157787`)
           .set("Authorization", `Bearer ${tokenAdmin}`)
           .send({
               state: 'solved',

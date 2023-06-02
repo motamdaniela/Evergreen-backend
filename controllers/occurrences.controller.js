@@ -58,13 +58,13 @@ exports.create = async (req, res) => {
 
       let school = await School.findOne({name: req.body.school});
       // console.log(school);
-      if(school.length == 0) {
+      if(school==undefined){
         return res.status(400).json({ success: false, message: "School does not exist" });
       } 
 
       let building = school.buildings.find(building => building.name == req.body.building)
       console.log (building)
-      if(building.length == 0) {
+      if(building==undefined) {
         return res.status(400).json({ success: false, message: "Building does not exist" });
       } 
       
