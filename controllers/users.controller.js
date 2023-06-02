@@ -575,3 +575,30 @@ exports.receiveReward = async (req, res) => {
     });
   }
 };
+
+//? get one
+exports.findLogged = async (req, res) => {
+  try {
+    let user = await User.find({
+      id: req.loggedUser.id,
+    }).exec();
+    if (user) {
+      res.status(200).json({ success: true, user: user });
+
+    } else if (user == null) {
+      return res.status(401).json({
+        success: false, msg: "You must be authenticated",
+      });
+    } else {
+      return res.status(403).json({
+        success: false,
+        msg: "You don't have access to this",
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};
