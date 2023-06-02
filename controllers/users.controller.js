@@ -583,9 +583,7 @@ exports.receiveReward = async (req, res) => {
 //? get one
 exports.findLogged = async (req, res) => {
   try {
-    let user = await User.find({
-      id: req.loggedUser.id,
-    }).exec();
+    let user = await User.findById(req.loggedUser.id).exec();
     if (user) {
       res.status(200).json({ success: true, user: user });
 
