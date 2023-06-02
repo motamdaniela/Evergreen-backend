@@ -120,16 +120,16 @@ describe("GET /activities", () => {
 describe('GET /activities/:activityID', () => {
   it('should get one activity', async () => {
     activity = await activities.create({
-      'photo': 'https://cdn.pixabay.com/photo/2018/11/17/22/15/trees-3822149_960_720.jpg',
-      'idTheme': '6466461a64186bf0efed6b6a',
-      'date': 'fevereiro',
-      'begin': '20230201',
-      'end': '20230228',
-      'description': ['description 1', 'description 2', 'desccription 3'],
-      'title': 'plantação árvores',
-      'coordinator': `${user.id}`,
-      'place': 'campus 2',
-      'users': []
+      photo: 'https://cdn.pixabay.com/photo/2018/11/17/22/15/trees-3822149_960_720.jpg',
+      idTheme: '6466461a64186bf0efed6b6a',
+      date: 'fevereiro',
+      begin: '20230201',
+      end: '20230228',
+      description: ['description 1', 'description 2', 'desccription 3'],
+      title: 'plantação árvores',
+      coordinator: `${user.id}`,
+      place: 'campus 2',
+      users: []
     })
     theme = await themes.create({
       name: 'Água',
@@ -225,7 +225,7 @@ describe('PATCH /activities/participation/:activityID/users/:userID', () => {
   });
 });
 
-// ! activity suggestion
+// * activity suggestion
 describe('POST /activities/suggestion', () => {
   it("should create a suggestion", async () => {
     const res = await request(app)
