@@ -5,6 +5,7 @@ const { app, server } = require("../index");
 const jwt = require("jsonwebtoken");
 const config = require("../config/db.config.js");
 const { activities } = require("../models");
+const { themes } = require("../models");
 
 let mongoServer;
 
@@ -24,14 +25,14 @@ afterAll(async () => {
   server.close();
 });
 
-let token, tokenAdmin, tokenSecurity, user, activity
+let token, tokenAdmin, tokenSecurity, user, activity, theme
 
 // * signup
 describe("POST /users/signup", () => {
   it("should create a user", async () => {
     const res = await request(app).post("/users/signup").send({
-      email: "user@example.com",
-      username: "user",
+      email: "user3@example.com",
+      username: "user3",
       name: "user",
       password: "123",
       confPassword: "123",
@@ -69,7 +70,7 @@ describe("POST /users/signup", () => {
 describe("POST /users/login", () => {
   it("should login as user", async () => {
     const res = await request(app).post("/users/login").send({
-      username: "user",
+      username: "user3",
       password: "123",
     });
     token = res.body.accessToken;
@@ -102,125 +103,127 @@ describe("GET /activities", () => {
   it("should get all activities", async () => {
     const res = await request(app)
       .get("/activities")
-      .set("Authorization", `Bearer ${token}`); 
-      
+      .set("Authorization", `Bearer ${token}`);
+
     expect(res.statusCode).toBe(200);
   });
 
-  it('should say you dont have access', async () => {
+  it("should say you dont have access", async () => {
     const res = await request(app)
-      .get('/activities')
-      .set('Authorization', `Bearer ${tokenAdmin}`)
-    expect(res.statusCode).toBe(403)
+      .get("/activities")
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(403);
   });
 });
 
 // * get one activity
-describe('GET /activities/:activityID', () => {
-  it('should get one activity', async () => {
+describe("GET /activities/:activityID", () => {
+  it("should get one activity", async () => {
     activity = await activities.create({
-      'photo': 'https://cdn.pixabay.com/photo/2018/11/17/22/15/trees-3822149_960_720.jpg',
-      'idTheme': '6466461a64186bf0efed6b6a',
-      'date': 'fevereiro',
-      'begin': '20230201',
-      'end': '20230228',
-      'description': ['description 1', 'description 2', 'desccription 3'],
-      'title': 'plantação árvores',
-      'coordinator': `${user.id}`,
-      'place': 'campus 2',
-      'users': []
+      photo: 'https://cdn.pixabay.com/photo/2018/11/17/22/15/trees-3822149_960_720.jpg',
+      idTheme: '6466461a64186bf0efed6b6a',
+      date: 'fevereiro',
+      begin: '20230201',
+      end: '20230228',
+      description: ['description 1', 'description 2', 'desccription 3'],
+      title: 'plantação árvores',
+      coordinator: `${user.id}`,
+      place: 'campus 2',
+      users: []
+    })
+    theme = await themes.create({
+      name: 'Água',
+      color: '#ffffff'
     })
     const res = await request(app)
       .get(`/activities/${activity.id}`)
     expect(res.statusCode).toBe(200)
   });
 
-  it('should say activity doesnt exist', async () => {
-    const res = await request(app)
-      .get('/activities/6475de6221aff7ae2937c703')
-    expect(res.statusCode).toBe(404)
+  it("should say activity doesnt exist", async () => {
+    const res = await request(app).get("/activities/6475de6221aff7ae2937c703");
+    expect(res.statusCode).toBe(404);
   });
 
-  it('should say id is not valid', async () => {
-    const res = await request(app)
-      .get('/activities/...')
-    expect(res.statusCode).toBe(400)
-  })
+  it("should say id is not valid", async () => {
+    const res = await request(app).get("/activities/...");
+    expect(res.statusCode).toBe(400);
+  });
 });
 
 // * subscribe to an activity
-describe('PATCH /activities/:activityID', () => {
-  it('should subscribe to activity', async () => {
+describe("PATCH /activities/:activityID", () => {
+  it("should subscribe to activity", async () => {
     const res = await request(app)
       .patch(`/activities/${activity.id}`)
-      .set('Authorization', `Bearer ${token}`)
-    expect(res.statusCode).toBe(200)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(200);
   });
 
-  it('should say user role is required', async () => {
+  it("should say user role is required", async () => {
     const res = await request(app)
-    .patch(`/activities/${activity.id}`)
-    .set('Authorization', `Bearer ${tokenAdmin}`)
-  expect(res.statusCode).toBe(403)
+      .patch(`/activities/${activity.id}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(403);
   });
 
-  it('should say id is not valid', async () => {
+  it("should say id is not valid", async () => {
     const res = await request(app)
-    .patch('/activities/...')
-    .set('Authorization', `Bearer ${token}`)
-  expect(res.statusCode).toBe(400)
-  })
+      .patch("/activities/...")
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(400);
+  });
 });
 
 // * get all activities from coordinator
-describe('GET /activities/coordinator', () => {
-  it('should get all activities from coordinator', async () => {
+describe("GET /activities/coordinator", () => {
+  it("should get all activities from coordinator", async () => {
     const res = await request(app)
-      .get('/activities/coordinator')
-      .set('Authorization', `Bearer ${token} || ${tokenAdmin}`)
-    expect(res.statusCode).toBe(200)
+      .get("/activities/coordinator")
+      .set("Authorization", `Bearer ${token} || ${tokenAdmin}`);
+    expect(res.statusCode).toBe(200);
   });
 
-  it('should say user or admin role is required', async () => {
+  it("should say user or admin role is required", async () => {
     const res = await request(app)
-      .get('/activities/coordinator')
-      .set('Authorization', `Bearer ${tokenSecurity}`)
-    expect(res.statusCode).toBe(403)
+      .get("/activities/coordinator")
+      .set("Authorization", `Bearer ${tokenSecurity}`);
+    expect(res.statusCode).toBe(403);
   });
 
-  it('should say you are not the coordinator of any activity', async () => {
+  it("should say you are not the coordinator of any activity", async () => {
     const res = await request(app)
-      .get('/activities/coordinator')
-      .set('Authorization', `Bearer ${tokenSecurity}`)
-    expect(res.statusCode).toBe(403)
-  })
+      .get("/activities/coordinator")
+      .set("Authorization", `Bearer ${tokenSecurity}`);
+    expect(res.statusCode).toBe(403);
+  });
 });
 
 // * verify participation
-describe('PATCH /activities/participation/:activityID/users/:userID', () => {
-  it('should verify users presence', async () => {
+describe("PATCH /activities/participation/:activityID/users/:userID", () => {
+  it("should verify users presence", async () => {
     const res = await request(app)
       .patch(`/activities/participation/${activity.id}/users/${user.id}`)
-      .set('Authorization', `Bearer ${tokenAdmin}`)
-    expect(res.statusCode).toBe(200)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(200);
   });
 
-  it('should say admin role is required', async () => {
+  it("should say admin role is required", async () => {
     const res = await request(app)
       .patch(`/activities/participation/${activity.id}/users/${user.id}`)
-      .set('Authorization', `Bearer ${token}`)
-      expect(res.statusCode).toBe(403)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(403);
   });
 
-  it('should say id is not valid', async () => {
+  it("should say id is not valid", async () => {
     const res = await request(app)
       .patch(`/activities/participation/.../users/${user.id}`)
-      .set('Authorization', `Bearer ${tokenAdmin}`) 
-    expect(res.statusCode).toBe(400)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(400);
   });
 });
 
-// ! activity suggestion
+// * activity suggestion
 describe('POST /activities/suggestion', () => {
   it("should create a suggestion", async () => {
     const res = await request(app)
@@ -232,8 +235,8 @@ describe('POST /activities/suggestion', () => {
         objectives: 'alguns objetivos',
         goals: 'metas',
         resources: 'recursos necessarios',
-        userID: `${user.id}`,
       });
+
     expect(res.statusCode).toBe(201);
   });
 
@@ -246,13 +249,12 @@ describe('POST /activities/suggestion', () => {
         description: 'uma descrição',
         objectives: 'alguns objetivos',
         goals: 'metas',
-        resources: 'recursos necessarios',
-        userID: `${user.id}`,
+        resources: 'recursos necessarios'
       });
     expect(res.statusCode).toBe(403);
   });
 
-  it('should say theme is invalid', async () => {
+  it("should say theme is invalid", async () => {
     const res = await request(app)
       .post("/activities/suggestion")
       .set("Authorization", `Bearer ${token}`)
@@ -261,9 +263,8 @@ describe('POST /activities/suggestion', () => {
         description: 'uma descrição',
         objectives: 'alguns objetivos',
         goals: 'metas',
-        resources: 'recursos necessarios',
-        userID: `${user.id}`,
+        resources: 'recursos necessarios'
       });
     expect(res.statusCode).toBe(400);
-  })
+  });
 });

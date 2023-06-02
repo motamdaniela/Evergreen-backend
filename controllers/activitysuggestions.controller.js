@@ -27,7 +27,7 @@ exports.create = async (req, res) => {
       } else {
         res.status(400).json({
           success: false,
-          msg: err.message || "Invalid theme",
+          msg:"Invalid theme",
         });
       }
     }
