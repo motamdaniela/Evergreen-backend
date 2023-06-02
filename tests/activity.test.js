@@ -5,6 +5,7 @@ const { app, server } = require("../index");
 const jwt = require("jsonwebtoken");
 const config = require("../config/db.config.js");
 const { activities } = require("../models");
+const { themes } = require("../models");
 
 let mongoServer;
 
@@ -24,7 +25,7 @@ afterAll(async () => {
   server.close();
 });
 
-let token, tokenAdmin, tokenSecurity, user, activity
+let token, tokenAdmin, tokenSecurity, user, activity, theme
 
 // * signup
 describe("POST /users/signup", () => {
@@ -130,6 +131,10 @@ describe('GET /activities/:activityID', () => {
       'place': 'campus 2',
       'users': []
     })
+    theme = await themes.create({
+      name: 'Água',
+      color: '#ffffff'
+    })
     const res = await request(app)
       .get(`/activities/${activity.id}`)
     expect(res.statusCode).toBe(200)
@@ -232,7 +237,6 @@ describe('POST /activities/suggestion', () => {
         objectives: 'alguns objetivos',
         goals: 'metas',
         resources: 'recursos necessarios',
-        userID: `${user.id}`,
       });
     expect(res.statusCode).toBe(201);
   });
@@ -246,8 +250,7 @@ describe('POST /activities/suggestion', () => {
         description: 'uma descrição',
         objectives: 'alguns objetivos',
         goals: 'metas',
-        resources: 'recursos necessarios',
-        userID: `${user.id}`,
+        resources: 'recursos necessarios'
       });
     expect(res.statusCode).toBe(403);
   });
@@ -261,8 +264,7 @@ describe('POST /activities/suggestion', () => {
         description: 'uma descrição',
         objectives: 'alguns objetivos',
         goals: 'metas',
-        resources: 'recursos necessarios',
-        userID: `${user.id}`,
+        resources: 'recursos necessarios'
       });
     expect(res.statusCode).toBe(400);
   })
