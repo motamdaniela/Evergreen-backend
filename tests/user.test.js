@@ -436,7 +436,7 @@ describe("PATCH /users/adminEdit/:userID", () => {
       });
     expect(res.statusCode).toBe(400);
   });
-  it("should say passwords cdon't match", async () => {
+  it("should say passwords don't match", async () => {
     const res = await request(app)
       .patch(`/users/adminEdit/${user.id}`)
       .set("Authorization", `Bearer ${tokenAdmin}`)
