@@ -383,6 +383,10 @@ exports.editUser = async (req, res) => {
         }
         if (req.body.password == req.body.confPassword) {
           user.password = bcrypt.hashSync(req.body.password, 10);
+          return res.status(200).json({
+            success: true,
+            msg: `success`,
+          });
         } else {
           return res.status(403).json({
             success: false,
