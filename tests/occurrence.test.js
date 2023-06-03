@@ -165,11 +165,7 @@ describe("GET /occurrences", () => {
           description: 'luz ligada numa sala vazia',
           photo: 'aaaa',
         });
-
-        //! acho q o problema esta aqui but idk 
-        ocID = res.body.occurrence._id
-        console.log(res.body)
-        
+        ocID = res.body.occurrence._id      
         expect(res.statusCode).toBe(201);
       });
 
