@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const occurrencesController = require("../controllers/occurrences.controller");
+const schoolsController = require("../controllers/schools.controller");
 const authController = require("../controllers/auth.controller");
 
 router.use((req, res, next) => {
@@ -19,6 +20,9 @@ router
   .get(authController.verifyToken, occurrencesController.findAll)
   .post(authController.verifyToken, occurrencesController.create);
 
+router
+  .route("/schools")
+  .get(authController.verifyToken, schoolsController.findAll);
 router
   .route("/:occID")
   .get(authController.verifyToken, occurrencesController.findOne)
