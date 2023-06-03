@@ -49,15 +49,13 @@ exports.create = async (req, res) => {
       let keys = Object.keys(req.body);
       for (let i = 0; i < arr.length; i++) {
         if (!arr[i] || !arr[i].replace(/\s/g, "").length) {
-          console.log(keys[i]);
           return res
             .status(400)
             .json({ success: false, msg: `Please provide ${keys[i]}` });
         }
       }
-
       let school = await School.findOne({ name: req.body.school });
-      // console.log(school);
+
       if (school == undefined) {
         return res
           .status(400)
@@ -67,7 +65,7 @@ exports.create = async (req, res) => {
       let building = school.buildings.find(
         (building) => building.name == req.body.building
       );
-      console.log(building);
+
       if (building == undefined) {
         return res
           .status(400)
@@ -75,7 +73,11 @@ exports.create = async (req, res) => {
       }
 
       let today = new Date();
-      console.log(req.loggedUser.id);
+      let other = "";
+      if (req.body.type == "Outro") {
+        other = req.body.other;
+      }
+
       let oc = await Occurrence.create({
         date:
           today.getDate() +
@@ -97,6 +99,7 @@ exports.create = async (req, res) => {
         photo: req.body.photo,
         userID: req.loggedUser.id,
         state: "pending",
+        other: other,
       });
       return res.status(201).json({
         success: true,

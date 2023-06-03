@@ -64,7 +64,6 @@ module.exports = (mongoose) => {
       },
       other: {
         type: String,
-        allowNull: false,
       },
     },
     { timestamps: false }
