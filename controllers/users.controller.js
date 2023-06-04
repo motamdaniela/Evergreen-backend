@@ -3,40 +3,40 @@ const bcrypt = require("bcryptjs");
 const config = require("../config/db.config.js");
 const db = require("../models");
 const User = db.users;
+const Mission = db.missions;
 
 //! for cloudinary
 const cloudinary = require("cloudinary").v2;
 // cloudinary configuration
 cloudinary.config({
-cloud_name: config.C_CLOUD_NAME,
-api_key: config.C_API_KEY,
-api_secret: config.C_API_SECRET
+  cloud_name: config.C_CLOUD_NAME,
+  api_key: config.C_API_KEY,
+  api_secret: config.C_API_SECRET,
 });
-
 
 exports.postImg = async (req, res) => {
   try {
-  let user_image = null;
-  if (req.file) {
-  // upload image
-  user_image = await cloudinary.uploader.upload(req.file.path);
-  }
-  // save user to DB
-  let img = await User.postImg({
-  profile_image: user_image ? user_image.url : null, // save URL to access the image
-  cloudinary_id: user_image ? user_image.public_id : null // save image ID to delete it
-  });
-  return res.status(201).json({ success: true, msg: "image posted successfully!", img: img });
-  }
-  catch (err) { 
+    let user_image = null;
+    if (req.file) {
+      // upload image
+      user_image = await cloudinary.uploader.upload(req.file.path);
+    }
+    // save user to DB
+    let img = await User.postImg({
+      profile_image: user_image ? user_image.url : null, // save URL to access the image
+      cloudinary_id: user_image ? user_image.public_id : null, // save image ID to delete it
+    });
+    return res
+      .status(201)
+      .json({ success: true, msg: "image posted successfully!", img: img });
+  } catch (err) {
     res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred while posting image.",
     });
-   };
-  };
-//!  
-
+  }
+};
+//!
 
 // ? sign up
 exports.createUser = async (req, res) => {
@@ -88,7 +88,7 @@ exports.createUser = async (req, res) => {
 
     let today = new Date();
     // Save user to DB
-    await User.create({
+    let user = await User.create({
       type: req.body.type,
       email: req.body.email,
       username: req.body.username,
@@ -115,6 +115,11 @@ exports.createUser = async (req, res) => {
       occurrencesDone: 0,
       rewards: [],
       council: false,
+    });
+    let missions = await Mission.find({});
+    missions.forEach((mission) => {
+      mission.users.push({ user: user._id, status: 0 });
+      Mission.updateOne({ _id: mission._id }, mission).exec();
     });
     return res.status(201).json({
       success: true,
@@ -618,10 +623,10 @@ exports.findLogged = async (req, res) => {
     let user = await User.findById(req.loggedUser.id).exec();
     if (user) {
       res.status(200).json({ success: true, user: user });
-
     } else if (user == null) {
       return res.status(401).json({
-        success: false, msg: "You must be authenticated",
+        success: false,
+        msg: "You must be authenticated",
       });
     } else {
       return res.status(403).json({
