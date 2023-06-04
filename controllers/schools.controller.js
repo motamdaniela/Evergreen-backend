@@ -17,7 +17,7 @@ exports.findAll = async (req, res) => {
     res.status(500).json({
       success: false,
       msg:
-        err.message || "Some error occurred while retrieving all occurrences.",
+        err.message || "Some error occurred while retrieving all schools.",
     });
   }
 };

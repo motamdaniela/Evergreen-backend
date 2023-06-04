@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const activitiesController = require("../controllers/activities.controller");
 const suggestionsController = require("../controllers/activitysuggestions.controller");
+const themesController = require("../controllers/themes.controller")
 const authController = require("../controllers/auth.controller");
 
 router.use((req, res, next) => {
@@ -20,6 +21,10 @@ router.route("/").get(authController.verifyToken, activitiesController.findAll);
 router
   .route("/coordinator")
   .get(authController.verifyToken, activitiesController.findAllCoordinator);
+  
+router
+  .route("/themes")
+  .get(authController.verifyToken, themesController.findAll);
 
 router
   .route("/:activityID")
@@ -33,5 +38,6 @@ router
 router
   .route("/suggestion")
   .post(authController.verifyToken, suggestionsController.create);
+
 
 module.exports = router;
