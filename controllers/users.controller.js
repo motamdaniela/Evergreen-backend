@@ -4,6 +4,40 @@ const config = require("../config/db.config.js");
 const db = require("../models");
 const User = db.users;
 
+//! for cloudinary
+const cloudinary = require("cloudinary").v2;
+// cloudinary configuration
+cloudinary.config({
+cloud_name: config.C_CLOUD_NAME,
+api_key: config.C_API_KEY,
+api_secret: config.C_API_SECRET
+});
+
+
+exports.postImg = async (req, res) => {
+  try {
+  let user_image = null;
+  if (req.file) {
+  // upload image
+  user_image = await cloudinary.uploader.upload(req.file.path);
+  }
+  // save user to DB
+  let img = await User.postImg({
+  profile_image: user_image ? user_image.url : null, // save URL to access the image
+  cloudinary_id: user_image ? user_image.public_id : null // save image ID to delete it
+  });
+  return res.status(201).json({ success: true, msg: "image posted successfully!", img: img });
+  }
+  catch (err) { 
+    res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred while posting image.",
+    });
+   };
+  };
+//!  
+
+
 // ? sign up
 exports.createUser = async (req, res) => {
   try {
@@ -418,8 +452,6 @@ exports.editProfile = async (req, res) => {
       });
     }
     let user = await User.findById(req.params.userID);
-    console.log(user._id);
-    console.log(req.loggedUser.id);
     if (user._id == req.loggedUser.id) {
       if (req.body.username && req.body.username.replace(/\s/g, "").length) {
         if ((await User.find({ username: req.body.username })).length > 0) {
