@@ -4,20 +4,12 @@ const School = db.schools;
 exports.findAll = async (req, res) => {
   try {
     console.log("aii");
-    if (req.loggedUser) {
-      let schools = await School.find({}).exec();
-      res.status(200).json({ success: true, schools: schools });
-    } else {
-      return res.status(401).json({
-        success: false,
-        msg: "You have to be logged in",
-      });
-    }
+    let schools = await School.find({}).exec();
+    res.status(200).json({ success: true, schools: schools });
   } catch (err) {
     res.status(500).json({
       success: false,
-      msg:
-        err.message || "Some error occurred while retrieving all schools.",
+      msg: err.message || "Some error occurred while retrieving all schools.",
     });
   }
 };

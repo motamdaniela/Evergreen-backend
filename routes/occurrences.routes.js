@@ -21,9 +21,7 @@ router
   .get(authController.verifyToken, occurrencesController.findAll)
   .post(authController.verifyToken, occurrencesController.create);
 
-router
-  .route("/schools")
-  .get(authController.verifyToken, schoolsController.findAll);
+router.route("/schools").get(schoolsController.findAll);
 
 router.route("/types").get(authController.verifyToken, typesController.findAll);
 
