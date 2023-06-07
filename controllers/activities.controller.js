@@ -100,17 +100,24 @@ exports.subscribe = async (req, res) => {
       });
     } else {
       const activity = await Activity.findById(req.params.activityID);
-      if (activity.users.find((user) => user.id == req.loggedUser.id)) {
-        activity.users.splice(
-          activity.users.indexOf(
-            activity.users.find((user) => user.id == req.loggedUser.id)
-          ),
-          1
-        );
-      } else {
-        activity.users.push({ id: req.loggedUser.id, status: "subscribed" });
+      console.log(activity)
+      if(!activity) {
+        return res.status(404).json({
+          success: false,
+          msg: `Cannot find any activity with ID ${req.params.activityID}`,
+        })
       }
-      await activity.save();
+      if (activity.users.find((user) => user.user == req.loggedUser.id)) {
+        let index = activity.users.indexOf(activity.users.find((user) => user.user == req.loggedUser.id))
+        activity.users.splice(index,1)
+        console.log('1', activity.users)
+      } else {
+        activity.users.push({ user: req.loggedUser.id, status: "subscribed" });
+        console.log('2', activity.users)
+      }
+      // await activity.save();
+      Activity.updateOne({ _id: activity._id }, activity).exec();
+      console.log('done')
       return res.json({ success: true, activity: activity });
     }
   } catch (err) {
