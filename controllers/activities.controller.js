@@ -33,10 +33,14 @@ exports.findAll = async (req, res) => {
 };
 
 exports.findSub = async (req, res) => {
-  let condition = { users: users.find((user) => user.user = req.loggedUser.userID, user.status = 'subscribed') };
+  let data = []
   try {
     if (req.loggedUser.type == "user") {
-      let data = await Activity.find(condition);
+      Activity.forEach(activity => {
+        if(activity.users.find((user) => user.user = req.loggedUser.userID && user.status == 'subscribed')){
+          data.push(activity);
+        }
+      })
 
       return res.status(200).json({
         success: true,
