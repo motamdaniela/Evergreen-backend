@@ -27,6 +27,10 @@ router
   .get(authController.verifyToken, themesController.findAll);
 
 router
+  .route("/subscribed")
+  .get(authController.verifyToken, activitiesController.findSub);
+
+router
   .route("/:activityID")
   .get(activitiesController.findOne)
   .patch(authController.verifyToken, activitiesController.subscribe);

@@ -32,6 +32,37 @@ exports.findAll = async (req, res) => {
   }
 };
 
+exports.findSub = async (req, res) => {
+  let data = []
+  let activities = await Activity.find({})
+  try {
+    if (req.loggedUser.type == "user") {
+      activities.forEach((activity) => {
+        if(activity.users.find((user) => user.user == req.loggedUser.id && user.status == 'subscribed')){
+          console.log(req.loggedUser)
+          data.push(activity);
+          console.log(activity)
+        }
+      })
+
+      return res.status(200).json({
+        success: true,
+        activities: data,
+      });
+    } else {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires USER role!",
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};
+
 // ? gets all activities that you are the coordinator of
 exports.findAllCoordinator = async (req, res) => {
   try {
