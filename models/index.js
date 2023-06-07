@@ -5,6 +5,7 @@ db.mongoose = mongoose;
 
 (async () => {
   try {
+    console.log(dbConfig.URL)
     await db.mongoose.connect(dbConfig.URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
