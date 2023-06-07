@@ -27,6 +27,10 @@ router
   .get(authController.verifyToken, themesController.findAll);
 
 router
+  .route("/mine")
+  .get(authController.verifyToken, themesController.findAll);
+
+router
   .route("/:activityID")
   .get(activitiesController.findOne)
   .patch(authController.verifyToken, activitiesController.subscribe);
