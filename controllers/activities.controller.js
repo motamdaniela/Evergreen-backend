@@ -77,6 +77,7 @@ exports.findOne = async (req, res) => {
       activity: activity 
     });
   } catch (err) {
+    console.log(err)
     if (err.name === "CastError") {
       return res.status(400).json({
         success: false,
