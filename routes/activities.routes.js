@@ -27,7 +27,7 @@ router
   .get(authController.verifyToken, themesController.findAll);
 
 router
-  .route("/mine")
+  .route("/subscribed")
   .get(authController.verifyToken, activitiesController.findSub);
 
 router
