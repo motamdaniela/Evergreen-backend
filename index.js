@@ -19,7 +19,7 @@ app.use("/occurrences", require("./routes/occurrences.routes.js"));
 app.all("*", function (req, res) {
   res.status(404).json({ message: "WHAT???" });
 });
-const server = app.listen(port, host, () =>
+const server = app.listen(port,  () =>
   console.log(`App listening at http://${host}:${port}/`)
 );
 
