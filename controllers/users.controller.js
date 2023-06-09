@@ -386,7 +386,11 @@ exports.blockUser = async (req, res) => {
           message: "User does not exist",
         });
       } else {
-        user.state = req.body.state;
+        if(user.state == 'active') {
+          user.state == 'blocked'
+        } else {
+          user.state == 'active'
+        }
         await user.save();
         return res.status(200).json({
           success: true,
