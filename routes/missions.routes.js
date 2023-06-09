@@ -22,4 +22,8 @@ router
 
 router.route("/:missionID").get(missionsController.findOne);
 
+router
+  .route("/update")
+  .patch(authController.verifyToken, missionsController.update);
+
 module.exports = router;

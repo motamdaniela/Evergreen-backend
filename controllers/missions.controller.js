@@ -2,9 +2,33 @@ const db = require("../models");
 const Mission = db.missions;
 const User = db.users;
 
+exports.update = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "user") {
+      return res.status(403).json({
+        success: false,
+        msg: "You're not allowed to perform this request",
+      });
+    } else {
+      let missions = await Mission.find({});
+      missions = req.body.missions;
+      await Mission.save();
+      return res.status(200).json({
+        success: true,
+        missions: missions,
+      });
+    }
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+};
+
 exports.findAll = async (req, res) => {
   try {
-    //utilozadores do tipo admin não devem ter acesso às missoes
+    //utilizadores do tipo admin não devem ter acesso às missoes
     if (req.loggedUser.type !== "user") {
       return res.status(403).json({
         success: false,
