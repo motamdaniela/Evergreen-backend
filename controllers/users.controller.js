@@ -387,11 +387,12 @@ exports.blockUser = async (req, res) => {
         });
       } else {
         if(user.state == 'active') {
-          user.state == 'blocked'
-        } else {
-          user.state == 'active'
+          user.state = 'blocked'
+        } else if (user.state == 'blocked'){
+          user.state = 'active'
         }
-        await user.save();
+        // await user.save();
+        User.updateOne({ _id: user._id }, user).exec();
         return res.status(200).json({
           success: true,
           message: "User state was changed successfully",
