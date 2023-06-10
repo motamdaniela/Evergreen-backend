@@ -142,10 +142,8 @@ exports.subscribe = async (req, res) => {
       if (activity.users.find((user) => user.user == req.loggedUser.id)) {
         let index = activity.users.indexOf(activity.users.find((user) => user.user == req.loggedUser.id))
         activity.users.splice(index,1)
-        // console.log('1', activity.users)
       } else {
         activity.users.push({ user: req.loggedUser.id, status: "subscribed" });
-        // console.log('2', activity.users)
       }
       Activity.updateOne({ _id: activity._id }, activity).exec();
       // console.log('done')

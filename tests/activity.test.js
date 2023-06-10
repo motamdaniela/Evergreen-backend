@@ -167,6 +167,13 @@ describe("PATCH /activities/:activityID", () => {
     expect(res.statusCode).toBe(403);
   });
 
+  it("should say activity does not exist", async () => {
+    const res = await request(app)
+    .patch('/activities/6475de6221aff7ae2937c703')
+    .set('Authorization', `Bearer ${token}`)
+    expect(res.statusCode).toBe(404)
+  })
+
   it("should say id is not valid", async () => {
     const res = await request(app)
       .patch("/activities/...")

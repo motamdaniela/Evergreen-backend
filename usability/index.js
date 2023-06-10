@@ -62,7 +62,7 @@ const service = new chrome.ServiceBuilder("chromedriver");
     let profile = await driver.findElement(By.name("profilelink"));
     await profile.click();
     await driver.sleep(1000);
-    let logOut = await driver.findElement(By.id("logOutBtn"));
+    let logOut = await driver.findElement(By.className("logoutbtn"));
     await logOut.click();
     await driver.sleep(3000);
     await driver.quit();
@@ -83,7 +83,7 @@ const service = new chrome.ServiceBuilder("chromedriver");
     let title = await driver.getTitle();
     console.log(title);
 
-    let faq = await driver.findElement(By.name("faq"));
+    let faq = await driver.findElement(By.className("faqLink"));
     await faq.click();
     await driver.sleep(1000);
 
@@ -111,13 +111,13 @@ const service = new chrome.ServiceBuilder("chromedriver");
     let title = await driver.getTitle();
     console.log(title);
 
-    let faq = await driver.findElement(By.name("faq"));
+    let faq = await driver.findElement(By.className("faqLink"));
     await faq.click();
     await driver.sleep(1000);
-    let about = await driver.findElement(By.name("about"));
+    let about = await driver.findElement(By.className("aboutLink"));
     await about.click();
     await driver.sleep(1000);
-    let landing = await driver.findElement(By.name("landing"));
+    let landing = await driver.findElement(By.className("homeLink"));
     await landing.click();
     await driver.sleep(1000);
     let btn = await driver.findElement(By.id("btn0"));
