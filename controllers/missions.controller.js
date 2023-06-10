@@ -10,8 +10,21 @@ exports.update = async (req, res) => {
         msg: "You're not allowed to perform this request",
       });
     } else {
+      let missionsList = req.body.missions;
       let missions = await Mission.find({});
-      missions = req.body.missions;
+      let list = [];
+
+      missions.forEach((mission) => {
+        missionsList.forEach((m) => {
+          if (mission._id == m.id) {
+            let user = mission.users.find((user) => user.user == m.user);
+            user.user = m.user;
+            user.status = m.status;
+            Mission.updateOne({ _id: mission._id }, mission).exec();
+          }
+        });
+      });
+
       await Mission.save();
       return res.status(200).json({
         success: true,
