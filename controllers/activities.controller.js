@@ -63,12 +63,21 @@ exports.findSub = async (req, res) => {
 exports.findAllCoordinator = async (req, res) => {
   try {
     if (req.loggedUser.type == "user" || req.loggedUser.type == "admin") {
-      let activities = await Activity.find({ coordinator: req.loggedUser.id });
+      let data = []
+      let user = await User.findById({ _id: req.loggedUser.id })
+      console.log(user);
+      let activities = await Activity.find({});
+      activities.forEach((activity) => {
+        if(activity.coordinator == user.email) {
+          data.push(activity)
+        }
+      })
+      
       if (activities.length > 0) {
         return res.status(200).json({
           success: true,
-          num: activities.length,
-          activities: activities,
+          num: data.length,
+          activities: data,
         });
       } else {
         return res.status(403).json({
