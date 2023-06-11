@@ -5,14 +5,9 @@ const User = db.users;
 
 // ? gets all activities
 exports.findAll = async (req, res) => {
-  let theme = await Theme.findById(req.query.idTheme);
-  let condition = {};
-  if (theme != undefined) {
-    condition = { idTheme: theme._id };
-  }
   try {
-    if (req.loggedUser.type == "user") {
-      let data = await Activity.find(condition);
+    if (req.loggedUser.type == "user" || req.loggedUser.type == "admin") {
+      let data = await Activity.find({});
 
       return res.status(200).json({
         success: true,
@@ -21,7 +16,7 @@ exports.findAll = async (req, res) => {
     } else {
       return res.status(403).json({
         success: false,
-        msg: "This request requires USER role!",
+        msg: "This request requires USER or ADMIN role!",
       });
     }
   } catch (err) {
