@@ -386,10 +386,10 @@ exports.blockUser = async (req, res) => {
           message: "User does not exist",
         });
       } else {
-        if(user.state == 'active') {
-          user.state = 'blocked'
-        } else if (user.state == 'blocked'){
-          user.state = 'active'
+        if (user.state == "active") {
+          user.state = "blocked";
+        } else if (user.state == "blocked") {
+          user.state = "active";
         }
         // await user.save();
         User.updateOne({ _id: user._id }, user).exec();
@@ -596,12 +596,13 @@ exports.receiveReward = async (req, res) => {
     if (user.received == false) {
       points.forEach((point) => {
         if (points.indexOf(point) == user.streak - 1) {
-          user.point += point.points;
+          user.points += point.points;
           user.rewards.push(point.badge);
         }
       });
       user.received = true;
-      await user.save();
+      // await User.save();
+      User.updateOne({ _id: user._id }, user).exec();
       return res.status(200).json({
         success: true,
         message: "success!",
