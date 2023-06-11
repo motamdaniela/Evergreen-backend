@@ -5,8 +5,9 @@ const User = db.users;
 
 // ? gets all activities
 exports.findAll = async (req, res) => {
+
   try {
-    if (req.loggedUser.type == "user" || req.loggedUser.type == "admin") {
+    if (req.loggedUser.type == "user") {
       let data = await Activity.find({});
 
       return res.status(200).json({
@@ -16,7 +17,7 @@ exports.findAll = async (req, res) => {
     } else {
       return res.status(403).json({
         success: false,
-        msg: "This request requires USER or ADMIN role!",
+        msg: "This request requires USER role!",
       });
     }
   } catch (err) {
