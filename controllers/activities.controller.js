@@ -178,17 +178,15 @@ exports.verify = async (req, res) => {
       });
     } else {
       const activity = await Activity.findById(req.params.activityID);
-      console.log(activity)
       if(!activity) {
         return res.status(404).json({
           success: false,
           msg: "Activity not found",
         });
       }
-      if (activity.users.find(
-          (user) => user.user == req.params.userID && user.status == "subscribed")
-      ) {
-        let selUser = User.findById(req.params.userID)
+      if (activity.users.find((user) => user.user == req.params.userID && user.status == "subscribed")) {
+        const selUser = await User.findById(req.params.userID)
+        // console.log(selUser)
         activity.users.forEach((user) => {
           if (user.user == req.params.userID && user.status == "subscribed") {
             user.status = "participated"
