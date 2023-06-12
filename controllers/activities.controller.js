@@ -186,7 +186,6 @@ exports.verify = async (req, res) => {
       }
       if (activity.users.find((user) => user.user == req.params.userID && user.status == "subscribed")) {
         const selUser = await User.findById(req.params.userID)
-        // console.log(selUser)
         activity.users.forEach((user) => {
           if (user.user == req.params.userID && user.status == "subscribed") {
             user.status = "participated"
@@ -196,7 +195,7 @@ exports.verify = async (req, res) => {
         });
       }
       Activity.updateOne({ _id: activity._id }, activity).exec();
-      User.updateOne({ _id: selUser._id }, selUser).exec();
+      // User.updateOne({ _id: selUser._id }, selUser).exec();
       return res.json({ success: true, activity: activity });
     }
   } catch (err) {
