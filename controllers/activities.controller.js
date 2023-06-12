@@ -178,14 +178,20 @@ exports.verify = async (req, res) => {
       });
     } else {
       const activity = await Activity.findById(req.params.activityID);
-      if (
-        activity.users.find(
-          (user) => user.user == req.params.userID && user.status == "subscribed"
-        )
+      console.log(activity)
+      if(!activity) {
+        return res.status(404).json({
+          success: false,
+          msg: "Activity not found",
+        });
+      }
+      if (activity.users.find(
+          (user) => user.user == req.params.userID && user.status == "subscribed")
       ) {
         activity.users.forEach((user) => {
           if (user.user == req.params.userID && user.status == "subscribed") {
             user.status = "participated";
+            console.log(user);
           }
         });
       }
