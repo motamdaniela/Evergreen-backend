@@ -28,6 +28,6 @@ router.route("/types").get(authController.verifyToken, typesController.findAll);
 router
   .route("/:occID")
   .get(authController.verifyToken, occurrencesController.findOne)
-  .put(authController.verifyToken, occurrencesController.validate);
+  .patch(authController.verifyToken, occurrencesController.validate);
 
 module.exports = router;
