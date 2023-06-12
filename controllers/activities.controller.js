@@ -180,11 +180,11 @@ exports.verify = async (req, res) => {
       const activity = await Activity.findById(req.params.activityID);
       if (
         activity.users.find(
-          (user) => user.id == req.params.userID && user.status == "subscribed"
+          (user) => user.user == req.params.userID && user.status == "subscribed"
         )
       ) {
         activity.users.forEach((user) => {
-          if (user.id == req.params.userID && user.status == "subscribed") {
+          if (user.user == req.params.userID && user.status == "subscribed") {
             user.status = "participated";
           }
         });
