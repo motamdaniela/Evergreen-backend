@@ -196,6 +196,7 @@ exports.verify = async (req, res) => {
         });
       }
       Activity.updateOne({ _id: activity._id }, activity).exec();
+      User.updateOne({ _id: selUser._id }, selUser).exec();
       return res.json({ success: true, activity: activity });
     }
   } catch (err) {
