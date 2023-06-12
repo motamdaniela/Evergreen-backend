@@ -191,7 +191,8 @@ exports.verify = async (req, res) => {
         activity.users.forEach((user) => {
           if (user.user == req.params.userID && user.status == "subscribed") {
             user.status = "participated";
-            console.log(user);
+            user.activitiesCompleted += 1
+            user.points += 5
           }
         });
       }
