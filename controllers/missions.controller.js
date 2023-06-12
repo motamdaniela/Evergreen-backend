@@ -12,7 +12,6 @@ exports.update = async (req, res) => {
     } else {
       let missionsList = req.body.missions;
       let missions = await Mission.find({});
-      let list = [];
 
       missions.forEach((mission) => {
         missionsList.forEach((m) => {
@@ -24,8 +23,6 @@ exports.update = async (req, res) => {
           }
         });
       });
-
-      await Mission.save();
       return res.status(200).json({
         success: true,
         missions: missions,
