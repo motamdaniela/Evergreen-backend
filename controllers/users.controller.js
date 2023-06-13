@@ -86,7 +86,6 @@ exports.createUser = async (req, res) => {
         .json({ success: false, msg: `Username already in use!` });
     }
 
-    let today = new Date();
     // Save user to DB
     let user = await User.create({
       type: req.body.type,
@@ -97,17 +96,7 @@ exports.createUser = async (req, res) => {
       password: bcrypt.hashSync(req.body.password, 10),
       school: req.body.school,
       previousLoginDate: 0,
-      loginDate: +(
-        today.getFullYear() +
-        "" +
-        ((today.getMonth() + 1).toString().length != 2
-          ? "0" + (today.getMonth() + 1)
-          : today.getMonth() + 1) +
-        "" +
-        (today.getDate().toString().length != 2
-          ? "0" + today.getDate()
-          : today.getDate())
-      ),
+      loginDate: 0,
       streak: 0,
       received: false,
       points: 0,
@@ -427,6 +416,7 @@ exports.editUser = async (req, res) => {
         }
         if (req.body.password == req.body.confPassword) {
           user.password = bcrypt.hashSync(req.body.password, 10);
+          await User.save();
           return res.status(200).json({
             success: true,
             msg: `success`,
@@ -565,31 +555,24 @@ exports.receiveReward = async (req, res) => {
     let points = [
       {
         points: 1,
-        badge: "idk1",
       },
       {
         points: 3,
-        badge: "idk2",
       },
       {
         points: 5,
-        badge: "idk3",
       },
       {
         points: 8,
-        badge: "idk4",
       },
       {
         points: 10,
-        badge: "idk5",
       },
       {
         points: 15,
-        badge: "idk6",
       },
       {
         points: 20,
-        badge: "idk7",
       },
     ];
     let user = await User.findById(req.loggedUser.id);
@@ -597,7 +580,6 @@ exports.receiveReward = async (req, res) => {
       points.forEach((point) => {
         if (points.indexOf(point) == user.streak - 1) {
           user.points += point.points;
-          user.rewards.push(point.badge);
         }
       });
       user.received = true;
