@@ -4,15 +4,27 @@ const config = require("../config/db.config.js");
 const db = require("../models");
 const User = db.users;
 const Mission = db.missions;
+const multer = require("multer");
 
-//! for cloudinary
 const cloudinary = require("cloudinary").v2;
+//! for cloudinary
 // cloudinary configuration
 cloudinary.config({
   cloud_name: config.C_CLOUD_NAME,
   api_key: config.C_API_KEY,
   api_secret: config.C_API_SECRET,
 });
+
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "/tmp"); // set up a directory named “tmp” where all files will be saved
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname); // give the files a new identifier
+  },
+});
+// acccepts a single file upload: specifies the field name where multer looks for the file
+const multerUploads = multer({ storage }).single("image");
 
 exports.postImg = async (req, res) => {
   try {
