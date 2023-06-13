@@ -65,6 +65,9 @@ router
   .route("/createAdmin")
   .post(authController.verifyToken, usersController.createAdmin);
 
-
 router.route("/getLogged").get(authController.verifyToken, usersController.findLogged);
+
+router.route('/pointsAct/:userID').patch(authController.verifyToken, usersController.addPointsAct)
+router.route('/pointsOc/:userID').patch(authController.verifyToken, usersController.addPointsOc)
+
 module.exports = router;
