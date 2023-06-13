@@ -185,17 +185,13 @@ exports.verify = async (req, res) => {
         });
       }
       if (activity.users.find((user) => user.user == req.params.userID && user.status == "subscribed")) {
-        const selUser = await User.findById(req.params.userID)
         activity.users.forEach((user) => {
           if (user.user == req.params.userID && user.status == "subscribed") {
             user.status = "participated"
-            selUser.activitiesCompleted += 1
-            selUser.points += 5
           }
         });
       }
       Activity.updateOne({ _id: activity._id }, activity).exec();
-      // User.updateOne({ _id: selUser._id }, selUser).exec();
       return res.json({ success: true, activity: activity });
     }
   } catch (err) {

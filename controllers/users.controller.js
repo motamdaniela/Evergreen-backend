@@ -595,7 +595,6 @@ exports.receiveReward = async (req, res) => {
         }
       });
       user.received = true;
-      // await User.save();
       User.updateOne({ _id: user._id }, user).exec();
       return res.status(200).json({
         success: true,
@@ -641,3 +640,76 @@ exports.findLogged = async (req, res) => {
     });
   }
 };
+
+// ? add points / activity
+exports.addPointsAct = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires ADMIN role!",
+      });
+    }
+    let user = await User.findById(req.params.userID)
+    console.log(user);
+    if (user) {
+      user.points += 5
+      user.activitiesCompleted += 1
+
+      User.updateOne({ _id: user._id }, user).exec();
+      return res.status(200).json({
+        success: true,
+        msg: "Points and activities completed altered successfully",
+        user: user
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        msg: "This user does not exist",
+      });
+    }
+  }
+  catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+}
+
+
+// ? add points / occurrence
+exports.addPointsOc = async (req, res) => {
+  try {
+    if (req.loggedUser.type !== "admin") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires ADMIN role!",
+      });
+    }
+    let user = await User.findById(req.params.userID)
+    console.log(user);
+    if (user) {
+      user.points += 5
+      user.occurrencesDone += 1
+
+      User.updateOne({ _id: user._id }, user).exec();
+      return res.status(200).json({
+        success: true,
+        msg: "Points and occurrences completed altered successfully",
+        user: user
+      });
+    } else {
+      return res.status(404).json({
+        success: false,
+        msg: "This user does not exist",
+      });
+    }
+  }
+  catch (err) {
+    return res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred",
+    });
+  }
+}
