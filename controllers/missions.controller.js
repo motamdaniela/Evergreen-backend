@@ -4,7 +4,7 @@ const User = db.users;
 
 exports.update = async (req, res) => {
   try {
-    if (req.loggedUser.type !== "user") {
+    if (!req.loggedUser.type) {
       return res.status(403).json({
         success: false,
         msg: "You're not allowed to perform this request",
@@ -39,7 +39,7 @@ exports.update = async (req, res) => {
 exports.findAll = async (req, res) => {
   try {
     //utilizadores do tipo admin não devem ter acesso às missoes
-    if (req.loggedUser.type !== "user") {
+    if (!req.loggedUser.type) {
       return res.status(403).json({
         success: false,
         msg: "You’re not allowed to perform this request",

@@ -6,7 +6,7 @@ const User = db.users;
 // ? gets all activities
 exports.findAll = async (req, res) => {
   try {
-    if (req.loggedUser.type == "user") {
+    if (req.loggedUser.type) {
       let data = await Activity.find({});
 
       return res.status(200).json({
