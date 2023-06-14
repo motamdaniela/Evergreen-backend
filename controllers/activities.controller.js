@@ -177,10 +177,10 @@ exports.subscribe = async (req, res) => {
 // ? verify participation of users in activity
 exports.verify = async (req, res) => {
   try {
-    if (req.loggedUser.type !== "admin") {
+    if (req.loggedUser.type !== "admin" && req.loggedUser.type !== 'user') {
       return res.status(403).json({
         success: false,
-        msg: "This request requires ADMIN role!",
+        msg: "This request requires ADMIN or USER role!",
       });
     } else {
       const activity = await Activity.findById(req.params.activityID);
