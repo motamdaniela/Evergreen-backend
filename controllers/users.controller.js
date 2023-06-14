@@ -96,13 +96,13 @@ exports.createAdmin = async (req, res) => {
     if (req.loggedUser.type !== "admin") {
       return res.status(403).json({
         success: false,
-        msg: "This request requires ADMIN role!",
+        msg: "Este pedido requer papel de ADMIN!",
       });
     } else {
       if (req.body.type !== "admin" && req.body.type !== "security") {
         return res.status(400).json({
           success: false,
-          msg: "the only users you can create are type admin and security",
+          msg: "Só podes criar users tipo Admin ou Segurança",
         });
       }
       let arr = [
@@ -118,39 +118,39 @@ exports.createAdmin = async (req, res) => {
         if (!arr[i] || !arr[i].replace(/\s/g, "").length) {
           return res
             .status(400)
-            .json({ success: false, msg: `Please provide ${keys[i]}!` });
+            .json({ success: false, msg: `Por favor fornece ${keys[i]}!` });
         }
       }
       if (/\s/g.test(req.body.username)) {
         return res.status(400).json({
           success: false,
-          msg: `Your username can't contain spaces!`,
+          msg: `O teu username não pode ter espaços!`,
         });
       }
 
       if (/\s/g.test(req.body.password)) {
         return res.status(400).json({
           success: false,
-          msg: `Your password can't contain spaces!`,
+          msg: `A tua password não pode ter espaços!`,
         });
       }
       if (!(req.body.password == req.body.confPassword)) {
         return res.status(403).json({
           success: false,
-          msg: `The passwords that you provided don't match!`,
+          msg: `As passwords não coincidem.`,
         });
       }
 
       if ((await User.find({ email: req.body.email })).length > 0) {
         return res
           .status(409)
-          .json({ success: false, msg: `Email already in use!` });
+          .json({ success: false, msg: `Email já se encontra em uso!` });
       } else if (
         (await User.find({ username: req.body.username })).length > 0
       ) {
         return res
           .status(409)
-          .json({ success: false, msg: `Username already in use!` });
+          .json({ success: false, msg: `Username já se encontra em uso!` });
       }
       // Save user to DB
       await User.create({
@@ -162,13 +162,13 @@ exports.createAdmin = async (req, res) => {
       });
       return res.status(201).json({
         success: true,
-        msg: "User was registered successfully!",
+        msg: "User foi registado",
       });
     }
   } catch (err) {
     res.status(500).json({
       success: false,
-      msg: err.message || "Some error occurred while signing up.",
+      msg: err.message || "Aconteceu algum erro",
     });
   }
 };
@@ -373,6 +373,7 @@ exports.editUser = async (req, res) => {
         msg: "This request requires Admin role!",
       });
     } else {
+      console.log("ok");
       let user = await User.findById(req.params.userID);
       if (req.body.password && req.body.password.replace(/\s/g, "").length) {
         if (/\s/g.test(req.body.password)) {
@@ -382,8 +383,10 @@ exports.editUser = async (req, res) => {
           });
         }
         if (req.body.password == req.body.confPassword) {
+          console.log("ok");
+          console.log(user);
           user.password = bcrypt.hashSync(req.body.password, 10);
-          await User.save();
+          User.updateOne({ _id: user._id }, user).exec();
           return res.status(200).json({
             success: true,
             msg: `success`,
@@ -605,17 +608,17 @@ exports.addPointsAct = async (req, res) => {
         msg: "This request requires ADMIN role!",
       });
     }
-    let user = await User.findById(req.params.userID)
+    let user = await User.findById(req.params.userID);
     console.log(user);
     if (user) {
-      user.points += 5
-      user.activitiesCompleted += 1
+      user.points += 5;
+      user.activitiesCompleted += 1;
 
       User.updateOne({ _id: user._id }, user).exec();
       return res.status(200).json({
         success: true,
         msg: "Points and activities completed altered successfully",
-        user: user
+        user: user,
       });
     } else {
       return res.status(404).json({
@@ -623,15 +626,13 @@ exports.addPointsAct = async (req, res) => {
         msg: "This user does not exist",
       });
     }
-  }
-  catch (err) {
+  } catch (err) {
     return res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred",
     });
   }
-}
-
+};
 
 // ? add points / occurrence
 exports.addPointsOc = async (req, res) => {
@@ -642,17 +643,17 @@ exports.addPointsOc = async (req, res) => {
         msg: "This request requires ADMIN role!",
       });
     }
-    let user = await User.findById(req.params.userID)
+    let user = await User.findById(req.params.userID);
     console.log(user);
     if (user) {
-      user.points += 5
-      user.occurrencesDone += 1
+      user.points += 5;
+      user.occurrencesDone += 1;
 
       User.updateOne({ _id: user._id }, user).exec();
       return res.status(200).json({
         success: true,
         msg: "Points and occurrences completed altered successfully",
-        user: user
+        user: user,
       });
     } else {
       return res.status(404).json({
@@ -660,11 +661,10 @@ exports.addPointsOc = async (req, res) => {
         msg: "This user does not exist",
       });
     }
-  }
-  catch (err) {
+  } catch (err) {
     return res.status(500).json({
       success: false,
       msg: err.message || "Some error occurred",
     });
   }
-}
+};
