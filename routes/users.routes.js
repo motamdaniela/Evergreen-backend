@@ -16,24 +16,6 @@ router.use((req, res, next) => {
   next();
 });
 
-//! for cloudinary
-const multer = require('multer')
-let storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-  cb(null, '/tmp') // set up a directory named “tmp” where all files will be saved
-  },
-  filename: function (req, file, cb) {
-  cb(null, Date.now() + '-' + file.originalname ) // give the files a new identifier
-  }
-  })
-  
-// acccepts a single file upload: specifies the field name where multer looks for the file
-const multerUploads = multer({ storage }).single('image');
-
-router.route('/image')
-.post(multerUploads, usersController.postImg);
-//!
-
 
 router.route("/").get(authController.verifyToken, usersController.findAll);
 
