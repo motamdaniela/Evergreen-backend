@@ -36,10 +36,6 @@ module.exports = (mongoose) => {
       },
       school: {
         type: String,
-        enum: {
-          values: ["ESMAD", "ESS", "ISEP"],
-          message: "{VALUE} is not supported",
-        },
         allowNull: false,
       },
       previousLoginDate: Number,
