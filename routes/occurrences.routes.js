@@ -26,6 +26,10 @@ router.route("/schools").get(schoolsController.findAll);
 router.route("/types").get(authController.verifyToken, typesController.findAll);
 
 router
+  .route("/:userID")
+  .delete(authController.verifyToken, occurrencesController.delete);
+
+router
   .route("/:occID")
   .get(authController.verifyToken, occurrencesController.findOne)
   .patch(authController.verifyToken, occurrencesController.validate);

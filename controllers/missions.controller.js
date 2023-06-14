@@ -108,3 +108,41 @@ exports.receiveBadge = async (req, res) => {
     });
   }
 };
+
+// ? delete deleted user from missions
+exports.delete = async (req, res) => {
+  try {
+    if (req.loggedUser.type == "user" || req.loggedUser.type == "security") {
+      return res.status(403).json({
+        success: false,
+        msg: "This request requires ADMIN role!",
+      });
+    } else {
+      let missions = await Mission.find({});
+      missions.forEach((mission) => {
+        mission.users.forEach((user) => {
+          if (user.user == req.params.userID) {
+            let index = mission.users.indexOf(user);
+            mission.users.splice(index, 1);
+            Mission.updateOne({ _id: mission._id }, mission).exec();
+          }
+        });
+        // await Mission.findOneAndUpdate(
+        //   { _id: mission._id },
+        //   { $pull: { users: { user: req.params.userID } } },
+        //   { safe: true, multi: false }
+        // );
+      });
+
+      return res.status(204).json({
+        success: true,
+        message: `user deleted from missions deleted successfully`,
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      msg: err.message || "Some error occurred.",
+    });
+  }
+};

@@ -23,6 +23,10 @@ router
 router.route("/:missionID").get(missionsController.findOne);
 
 router
+  .route("/:userID")
+  .delete(authController.verifyToken, missionsController.delete);
+
+router
   .route("/update")
   .patch(authController.verifyToken, missionsController.update);
 
