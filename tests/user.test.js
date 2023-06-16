@@ -458,6 +458,59 @@ describe("PATCH /users/adminEdit/:userID", () => {
   });
 });
 
+describe("GET /users/getLogged", () => {
+  it("should get logged", async () => {
+    const res = await request(app)
+      .get(`/users/getLogged`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(200);
+  });
+});
+
+describe("PATCH /users/pointsAct/:userID", () => {
+  it("should change activity points", async () => {
+    const res = await request(app)
+      .patch(`/users/pointsAct/${user.id}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(200);
+  });
+  it("should say user doesn't exist", async () => {
+    const res = await request(app)
+      .patch(`/users/pointsAct/648c4d490ded6b9a5cdc0735`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("should say you need admin role", async () => {
+    const res = await request(app)
+      .patch(`/users/pointsAct/${user.id}`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(403);
+  });
+});
+
+describe("PATCH /users/pointsOc/:userID", () => {
+  it("should change occurrence points", async () => {
+    const res = await request(app)
+      .patch(`/users/pointsOc/${user.id}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(200);
+  });
+  it("should say user doesn't exist", async () => {
+    const res = await request(app)
+      .patch(`/users/pointsOc/648c4d490ded6b9a5cdc0735`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("should say you need admin role", async () => {
+    const res = await request(app)
+      .patch(`/users/pointsOc/${user.id}`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(403);
+  });
+});
+
 describe("PATCH /users/edit/:userID", () => {
   it("should edit user profile", async () => {
     const res = await request(app)

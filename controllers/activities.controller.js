@@ -177,7 +177,7 @@ exports.subscribe = async (req, res) => {
 // ? verify participation of users in activity
 exports.verify = async (req, res) => {
   try {
-    if (req.loggedUser.type !== "admin" && req.loggedUser.type !== 'user') {
+    if (req.loggedUser.type !== "admin" && req.loggedUser.type !== "user") {
       return res.status(403).json({
         success: false,
         msg: "This request requires ADMIN or USER role!",
@@ -237,11 +237,6 @@ exports.delete = async (req, res) => {
             Activity.updateOne({ _id: activity._id }, activity).exec();
           }
         });
-        // await Activity.findOneAndUpdate(
-        //   { _id: activity._id },
-        //   { $pull: { users: { user: req.params.userID } } },
-        //   { safe: true, multi: false }
-        // );
       });
 
       return res.status(204).json({

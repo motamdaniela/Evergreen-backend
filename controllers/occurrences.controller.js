@@ -181,22 +181,14 @@ exports.delete = async (req, res) => {
         msg: "This request requires ADMIN role!",
       });
     } else {
-      let occurrences = await Occurrence.deleteMany({
+      await Occurrence.deleteMany({
         userID: req.params.userID,
       });
 
-      if (!occurrences) {
-        return res.status(404).json({
-          success: false,
-          message: "occurrence does not exist",
-        });
-      } else {
-        console.log("ok");
-        return res.status(204).json({
-          success: true,
-          message: `Occurrences deleted successfully`,
-        });
-      }
+      return res.status(204).json({
+        success: true,
+        message: `Occurrences deleted successfully`,
+      });
     }
   } catch (err) {
     res.status(500).json({

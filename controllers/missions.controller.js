@@ -127,11 +127,6 @@ exports.delete = async (req, res) => {
             Mission.updateOne({ _id: mission._id }, mission).exec();
           }
         });
-        // await Mission.findOneAndUpdate(
-        //   { _id: mission._id },
-        //   { $pull: { users: { user: req.params.userID } } },
-        //   { safe: true, multi: false }
-        // );
       });
 
       return res.status(204).json({

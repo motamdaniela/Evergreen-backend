@@ -25,7 +25,7 @@ afterAll(async () => {
   server.close();
 });
 
-let token, tokenAdmin, tokenSecurity, user, activity, theme
+let token, tokenAdmin, tokenSecurity, user, activity, theme;
 
 // * signup
 describe("POST /users/signup", () => {
@@ -107,37 +107,30 @@ describe("GET /activities", () => {
 
     expect(res.statusCode).toBe(200);
   });
-
-  it("should say you dont have access", async () => {
-    const res = await request(app)
-      .get("/activities")
-      .set("Authorization", `Bearer ${tokenAdmin}`);
-    expect(res.statusCode).toBe(403);
-  });
 });
 
 // * get one activity
 describe("GET /activities/:activityID", () => {
   it("should get one activity", async () => {
     activity = await activities.create({
-      photo: 'https://cdn.pixabay.com/photo/2018/11/17/22/15/trees-3822149_960_720.jpg',
-      idTheme: '6466461a64186bf0efed6b6a',
-      date: 'fevereiro',
-      begin: '20230201',
-      end: '20230228',
-      description: ['description 1', 'description 2', 'desccription 3'],
-      title: 'plantação árvores',
+      photo:
+        "https://cdn.pixabay.com/photo/2018/11/17/22/15/trees-3822149_960_720.jpg",
+      idTheme: "6466461a64186bf0efed6b6a",
+      date: "fevereiro",
+      begin: "20230201",
+      end: "20230228",
+      description: ["description 1", "description 2", "desccription 3"],
+      title: "plantação árvores",
       coordinator: `${user.id}`,
-      place: 'campus 2',
-      users: []
-    })
+      place: "campus 2",
+      users: [],
+    });
     theme = await themes.create({
-      name: 'Água',
-      color: '#ffffff'
-    })
-    const res = await request(app)
-      .get(`/activities/${activity.id}`)
-    expect(res.statusCode).toBe(200)
+      name: "Água",
+      color: "#ffffff",
+    });
+    const res = await request(app).get(`/activities/${activity.id}`);
+    expect(res.statusCode).toBe(200);
   });
 
   it("should say activity doesnt exist", async () => {
@@ -169,16 +162,33 @@ describe("PATCH /activities/:activityID", () => {
 
   it("should say activity does not exist", async () => {
     const res = await request(app)
-    .patch('/activities/6475de6221aff7ae2937c703')
-    .set('Authorization', `Bearer ${token}`)
-    expect(res.statusCode).toBe(404)
-  })
+      .patch("/activities/6475de6221aff7ae2937c703")
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(404);
+  });
 
   it("should say id is not valid", async () => {
     const res = await request(app)
       .patch("/activities/...")
       .set("Authorization", `Bearer ${token}`);
     expect(res.statusCode).toBe(400);
+  });
+});
+
+// * find subscribed
+describe("GET /activities/subscribed", () => {
+  it("should get subscribed activities", async () => {
+    const res = await request(app)
+      .get(`/activities/subscribed`)
+      .set("Authorization", `Bearer ${token}`);
+    expect(res.statusCode).toBe(200);
+  });
+
+  it("should say it requires user role", async () => {
+    const res = await request(app)
+      .get(`/activities/subscribed`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+    expect(res.statusCode).toBe(403);
   });
 });
 
@@ -215,10 +225,10 @@ describe("PATCH /activities/participation/:activityID/users/:userID", () => {
     expect(res.statusCode).toBe(200);
   });
 
-  it("should say admin role is required", async () => {
+  it("should say admin/user role is required", async () => {
     const res = await request(app)
       .patch(`/activities/participation/${activity.id}/users/${user.id}`)
-      .set("Authorization", `Bearer ${token}`);
+      .set("Authorization", `Bearer ${tokenSecurity}`);
     expect(res.statusCode).toBe(403);
   });
 
@@ -231,17 +241,17 @@ describe("PATCH /activities/participation/:activityID/users/:userID", () => {
 });
 
 // * activity suggestion
-describe('POST /activities/suggestion', () => {
+describe("POST /activities/suggestion", () => {
   it("should create a suggestion", async () => {
     const res = await request(app)
       .post("/activities/suggestion")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        theme: 'Água',
-        description: 'uma descrição',
-        objectives: 'alguns objetivos',
-        goals: 'metas',
-        resources: 'recursos necessarios',
+        theme: "Água",
+        description: "uma descrição",
+        objectives: "alguns objetivos",
+        goals: "metas",
+        resources: "recursos necessarios",
       });
 
     expect(res.statusCode).toBe(201);
@@ -252,11 +262,11 @@ describe('POST /activities/suggestion', () => {
       .post("/activities/suggestion")
       .set("Authorization", `Bearer ${tokenAdmin}`)
       .send({
-        theme: 'Água',
-        description: 'uma descrição',
-        objectives: 'alguns objetivos',
-        goals: 'metas',
-        resources: 'recursos necessarios'
+        theme: "Água",
+        description: "uma descrição",
+        objectives: "alguns objetivos",
+        goals: "metas",
+        resources: "recursos necessarios",
       });
     expect(res.statusCode).toBe(403);
   });
@@ -266,12 +276,31 @@ describe('POST /activities/suggestion', () => {
       .post("/activities/suggestion")
       .set("Authorization", `Bearer ${token}`)
       .send({
-        theme: 'Tema?',
-        description: 'uma descrição',
-        objectives: 'alguns objetivos',
-        goals: 'metas',
-        resources: 'recursos necessarios'
+        theme: "Tema?",
+        description: "uma descrição",
+        objectives: "alguns objetivos",
+        goals: "metas",
+        resources: "recursos necessarios",
       });
     expect(res.statusCode).toBe(400);
+  });
+});
+
+// * delete from activity
+describe("DELETE /activities/:userID", () => {
+  it("should delete an activity", async () => {
+    const res = await request(app)
+      .delete(`/activities/${user.id}`)
+      .set("Authorization", `Bearer ${tokenAdmin}`);
+
+    expect(res.statusCode).toBe(204);
+  });
+
+  it("should say admin role is required", async () => {
+    const res = await request(app)
+      .delete(`/activities/${user.id}`)
+      .set("Authorization", `Bearer ${token}`);
+
+    expect(res.statusCode).toBe(403);
   });
 });
