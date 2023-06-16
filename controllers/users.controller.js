@@ -159,6 +159,7 @@ exports.createAdmin = async (req, res) => {
         username: req.body.username,
         name: req.body.name,
         password: bcrypt.hashSync(req.body.password, 10),
+        loginDate: 0,
       });
       return res.status(201).json({
         success: true,
